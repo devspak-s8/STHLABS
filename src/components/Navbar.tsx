@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "motion/react";
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Zap, ArrowUpRight } from "lucide-react";
 
 const links = [
   { name: "Services", href: "#services" },
@@ -24,6 +24,16 @@ export const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    const id = href.replace('#', '');
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+    setIsMobileMenuOpen(false);
+  };
+
   const scrollToContact = () => {
     document.getElementById('start-project')?.scrollIntoView({ behavior: 'smooth' });
     setIsMobileMenuOpen(false);
@@ -38,7 +48,8 @@ export const Navbar = () => {
           : "bg-transparent border-b border-transparent"
       }`}
     >
-      <div id="logo" className="text-lg md:text-xl font-bold tracking-widest text-white uppercase shrink-0">
+      <div id="logo" className="flex items-center gap-2 text-lg md:text-xl font-bold tracking-widest text-white uppercase shrink-0">
+        <Zap className="text-accent fill-accent" size={20} />
         STH LABS
       </div>
       
@@ -48,6 +59,7 @@ export const Navbar = () => {
           <a
             key={link.name}
             href={link.href}
+            onClick={(e) => handleNavClick(e, link.href)}
             onMouseEnter={() => setHoveredLink(link.name)}
             onMouseLeave={() => setHoveredLink(null)}
             className="relative font-mono text-[10px] lg:text-xs tracking-tighter uppercase text-neutral-400 hover:text-accent transition-colors duration-200"
@@ -70,9 +82,10 @@ export const Navbar = () => {
         <button 
           onClick={scrollToContact}
           id="cta-nav" 
-          className="hidden sm:block bg-white text-black font-mono text-[10px] md:text-xs font-medium px-4 md:px-6 py-2 md:py-3 uppercase tracking-wider hover:bg-accent transition-colors duration-200"
+          className="hidden sm:flex items-center gap-2 bg-white text-black font-mono text-[10px] md:text-xs font-medium px-4 md:px-6 py-2 md:py-3 uppercase tracking-wider hover:bg-accent transition-colors duration-200 group"
         >
           Start a Project
+          <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
         </button>
 
         {/* Mobile Toggle */}
@@ -98,7 +111,7 @@ export const Navbar = () => {
                 <a
                   key={link.name}
                   href={link.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
+                  onClick={(e) => handleNavClick(e, link.href)}
                   className="font-sans text-2xl font-medium text-white hover:text-accent transition-colors"
                 >
                   {link.name}

@@ -1,20 +1,27 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# STH LABS | Systems Engineering Agency
 
-# Run and deploy your AI Studio app
+Building production-ready systems for serious founders.
 
-This contains everything you need to run your app locally.
+## Core Capabilities
 
-View your app in AI Studio: https://ai.studio/apps/95eec762-d706-40fb-a918-c5f59841286b
+- **MVP Development**: Rapid prototyping and development of functional MVPs designed to validate core hypotheses.
+- **Backend Systems & APIs**: Robust, scalable server-side architectures and RESTful/GraphQL API development.
+- **Automation Scripts**: Custom scripting and workflow automation to eliminate operational bottlenecks.
+- **Product Architecture**: Strategic technical planning and system design for long-term scalability.
 
-## Run Locally
+## Tech Stack
 
-**Prerequisites:**  Node.js
+- **Languages**: TypeScript, Node.js, Go, Python.
+- **Infrastructure**: AWS, Docker, Kubernetes, Terraform.
+- **Data**: PostgreSQL, Redis, GraphQL.
+- **Frontend**: React, Tailwind CSS, Framer Motion.
 
+## Engineering Philosophy
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+1. **Zero Trust Architecture**: Every component is verified by default.
+2. **Latency Optimization**: Milliseconds cost millions.
+3. **Elastically Scalable**: Systems that expand and contract based on real-time demand.
+4. **Hardware-Aware Code**: Software that extracts maximum efficiency from every cycle.
+
+---
+© 2026 STH LABS. ENGINEERED FOR PRECISION.

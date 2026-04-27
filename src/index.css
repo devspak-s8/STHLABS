@@ -20,6 +20,12 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  section {
+    scroll-margin-top: 80px;
+  }
   body {
     @apply bg-background text-white antialiased selection:bg-accent selection:text-black;
   }

@@ -1,5 +1,20 @@
-import { motion } from "motion/react";
-import { useState } from "react";
+import { motion, useSpring, useTransform, animate } from "motion/react";
+import { useState, useEffect } from "react";
+
+const AnimatedNumber = ({ value }: { value: number }) => {
+  const [displayValue, setDisplayValue] = useState(0);
+
+  useEffect(() => {
+    const controls = animate(displayValue, value, {
+      duration: 1.5,
+      ease: "easeOut",
+      onUpdate: (latest) => setDisplayValue(latest),
+    });
+    return () => controls.stop();
+  }, [value]);
+
+  return <span>{Math.round(displayValue).toLocaleString()}</span>;
+};
 
 const rates = {
   USD: 1,
@@ -43,14 +58,11 @@ interface PricingProps {
 export const Pricing = ({ onSelectTier }: PricingProps) => {
   const [currency, setCurrency] = useState<keyof typeof rates>("USD");
 
-  const formatPrice = (price: number, isCustom?: boolean) => {
-    if (isCustom) return "Custom";
+  const getPriceComponents = (price: number, isCustom?: boolean) => {
+    if (isCustom) return { prefix: "", value: null, suffix: "Custom" };
     const converted = price * rates[currency];
-    return new Intl.NumberFormat(currency === "NGN" ? "en-NG" : currency === "EUR" ? "de-DE" : "en-US", {
-      style: "currency",
-      currency: currency,
-      maximumFractionDigits: 0,
-    }).format(converted);
+    const symbol = currency === "NGN" ? "₦" : currency === "EUR" ? "€" : "$";
+    return { prefix: symbol, value: converted, suffix: "" };
   };
 
   const scrollToContact = (tierName: string) => {
@@ -103,10 +115,23 @@ export const Pricing = ({ onSelectTier }: PricingProps) => {
             </div>
             
             <div className="mb-8">
-              <div className="text-2xl md:text-3xl font-sans font-semibold text-white tracking-tight">
-                {formatPrice(tier.price, tier.isCustom)}
+              <div className="text-2xl md:text-3xl font-sans font-semibold text-white tracking-tight flex items-baseline gap-1">
+                {(() => {
+                  const { prefix, value, suffix } = getPriceComponents(tier.price, tier.isCustom);
+                  if (value === null) return <span>{suffix}</span>;
+                  return (
+                    <>
+                      <span className="text-xl md:text-2xl text-accent/50">{prefix}</span>
+                      <AnimatedNumber value={value} />
+                    </>
+                  );
+                })()}
               </div>
               <div className="font-mono text-[9px] md:text-[10px] text-neutral-500 uppercase mt-1">Starting deployment</div>
+            </div>
+
+            <div className="mb-4 font-mono text-[10px] text-accent uppercase tracking-widest">
+              <AnimatedNumber value={tier.features.length} /> Modules Included
             </div>
 
             <ul className="space-y-3 md:space-y-4 mb-8 md:mb-10 flex-grow">

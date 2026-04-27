@@ -18,9 +18,32 @@ const works = [
   }
 ];
 
+const logos = [
+  "NEURO", "ARCH-V", "SOLARIQ", "VECTOR", "CRYPTOX", "LUMINA", "SYNAPSE", "ORBITAL"
+];
+
 export const SelectedWork = () => {
   return (
     <section id="work" className="py-20 md:py-32 px-6 md:px-16 border-b border-border bg-background overflow-hidden">
+      {/* Logos Marquee */}
+      <div className="mb-20 overflow-hidden relative">
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-transparent to-background z-10 pointer-events-none" />
+        <motion.div 
+          animate={{ x: [0, -1000] }}
+          transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+          className="flex whitespace-nowrap gap-16 md:gap-32 items-center"
+        >
+          {[...logos, ...logos].map((logo, i) => (
+            <span 
+              key={i} 
+              className="font-sans text-2xl md:text-3xl font-black text-neutral-800 tracking-tighter hover:text-neutral-700 transition-colors cursor-default"
+            >
+              {logo}
+            </span>
+          ))}
+        </motion.div>
+      </div>
+
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-20 gap-4">
         <motion.h2 
           initial={{ opacity: 0, x: -50 }}
