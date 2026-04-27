@@ -1,0 +1,134 @@
+import { motion } from "motion/react";
+import { useState } from "react";
+
+const rates = {
+  USD: 1,
+  EUR: 0.92,
+  NGN: 1550,
+};
+
+const tiers = [
+  {
+    name: "System Blueprint",
+    price: 2500,
+    description: "Architectural consultation and technical design documentation.",
+    features: ["System Architecture Design", "Tech Stack Selection", "Security Audit Plan", "Scalability Roadmap"]
+  },
+  {
+    name: "Core MVP",
+    price: 8500,
+    description: "Complete engineering of a production-ready minimum viable product.",
+    features: ["Custom Web/Mobile App", "Scalable Backend", "CI/CD Pipeline", "Basic Security Setup"],
+    popular: true
+  },
+  {
+    name: "Enterprise Engine",
+    price: 25000,
+    description: "Full-scale system engineering for complex organizational needs.",
+    features: ["Complex Integrations", "High-Load Optimization", "Custom Automations", "Dedicated Support"]
+  },
+  {
+    name: "Custom Prototype",
+    price: 0,
+    isCustom: true,
+    description: "Tailored engineering for specific one-off research or pilot tools.",
+    features: ["One-off Scripts", "Research Prototypes", "Manual Integrations", "Fixed Scope Build"]
+  }
+];
+
+interface PricingProps {
+  onSelectTier: (tierName: string) => void;
+}
+
+export const Pricing = ({ onSelectTier }: PricingProps) => {
+  const [currency, setCurrency] = useState<keyof typeof rates>("USD");
+
+  const formatPrice = (price: number, isCustom?: boolean) => {
+    if (isCustom) return "Custom";
+    const converted = price * rates[currency];
+    return new Intl.NumberFormat(currency === "NGN" ? "en-NG" : currency === "EUR" ? "de-DE" : "en-US", {
+      style: "currency",
+      currency: currency,
+      maximumFractionDigits: 0,
+    }).format(converted);
+  };
+
+  const scrollToContact = (tierName: string) => {
+    onSelectTier(tierName);
+    document.getElementById('start-project')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  return (
+    <section id="pricing" className="py-20 md:py-32 px-6 md:px-16 border-b border-border bg-background overflow-hidden">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-20 gap-8">
+        <motion.h2 
+          initial={{ opacity: 0, x: -50 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          className="font-sans text-3xl md:text-5xl font-medium text-white tracking-tight uppercase"
+        >
+          Investment tiers
+        </motion.h2>
+        <div className="flex flex-col items-start md:items-end gap-4 w-full md:w-auto">
+          <span className="font-mono text-xs text-neutral-500 tracking-tighter">[ 05 ]</span>
+          <div className="flex border border-border bg-surface p-1 w-full md:w-auto">
+            {(["USD", "EUR", "NGN"] as const).map((curr) => (
+              <button
+                key={curr}
+                onClick={() => setCurrency(curr)}
+                className={`flex-1 md:flex-none px-4 py-2 md:px-3 md:py-1 font-mono text-[10px] uppercase tracking-widest transition-colors ${
+                  currency === curr ? "bg-white text-black" : "text-neutral-500 hover:text-white"
+                }`}
+              >
+                {curr}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {tiers.map((tier, i) => (
+          <motion.div
+            key={tier.name}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: i * 0.1 }}
+            className={`flex flex-col p-6 md:p-8 border ${tier.popular ? 'border-accent ring-1 ring-accent' : 'border-border'} bg-surface/30`}
+          >
+            <div className="mb-6 md:mb-8">
+              <h3 className="font-sans text-lg md:text-xl font-medium text-white mb-2">{tier.name}</h3>
+              <p className="font-sans text-xs md:text-sm text-neutral-400 h-12 line-clamp-3 md:line-clamp-2">{tier.description}</p>
+            </div>
+            
+            <div className="mb-8">
+              <div className="text-2xl md:text-3xl font-sans font-semibold text-white tracking-tight">
+                {formatPrice(tier.price, tier.isCustom)}
+              </div>
+              <div className="font-mono text-[9px] md:text-[10px] text-neutral-500 uppercase mt-1">Starting deployment</div>
+            </div>
+
+            <ul className="space-y-3 md:space-y-4 mb-8 md:mb-10 flex-grow">
+              {tier.features.map((feature) => (
+                <li key={feature} className="flex items-start gap-3">
+                  <span className="w-1 md:w-1.5 h-1 md:h-1.5 bg-accent mt-1.5 shrink-0" />
+                  <span className="font-sans text-xs md:text-sm text-neutral-300">{feature}</span>
+                </li>
+              ))}
+            </ul>
+
+            <button 
+              onClick={() => scrollToContact(tier.name)}
+              className={`w-full py-4 font-mono text-[10px] font-medium uppercase tracking-widest transition-colors ${
+                tier.popular ? 'bg-accent text-black hover:bg-white' : 'bg-white text-black hover:bg-accent'
+              }`}
+            >
+              Select Tier
+            </button>
+          </motion.div>
+        ))}
+      </div>
+    </section>
+  );
+};
