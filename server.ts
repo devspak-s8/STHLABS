@@ -9,6 +9,14 @@ async function startServer() {
 
   app.use(express.json());
 
+  // Status endpoint
+  app.get("/api/status", (req, res) => {
+    res.json({ 
+      emailConfigured: !!process.env.RESEND_API_KEY,
+      environment: process.env.NODE_ENV || "development"
+    });
+  });
+
   // Email sending endpoint
   app.post("/api/contact", async (req, res) => {
     const { name, email, message, tier } = req.body;
@@ -17,21 +25,20 @@ async function startServer() {
     const apiKey = process.env.RESEND_API_KEY;
     
     if (!apiKey) {
-      console.warn("RESEND_API_KEY not found. Simulating email send for:", email);
-      return res.status(200).json({ 
-        success: true, 
-        message: "Demo Mode: API key missing, but request received.",
-        data: req.body 
+      console.warn("RESEND_API_KEY not found. Emails will not be sent.");
+      return res.status(500).json({ 
+        success: false, 
+        error: "Server Configuration Error: RESEND_API_KEY is missing. Please add it to your environment variables." 
       });
     }
 
     const resend = new Resend(apiKey);
 
     try {
-      // 1. Send Internal Notification
+      // Note: If using the free tier/sandbox, you can ONLY send to your own verified email.
       const adminEmail = await resend.emails.send({
         from: 'QUETTRIX LABS <onboarding@resend.dev>',
-        to: ['apatirasulayman@gmail.com'],
+        to: ['admin@provenly.live'],
         subject: `[SYSTEM ALERT] New Project Inquiry: ${tier || "Custom"}`,
         html: `
           <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #000; line-height: 1.6;">

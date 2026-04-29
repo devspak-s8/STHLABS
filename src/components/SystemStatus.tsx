@@ -4,8 +4,20 @@ import { useEffect, useState } from "react";
 
 export const SystemStatus = () => {
   const [latency, setLatency] = useState(24);
+  const [emailStatus, setEmailStatus] = useState<"checking" | "active" | "inactive">("checking");
 
   useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const response = await fetch("/api/status");
+        const data = await response.json();
+        setEmailStatus(data.emailConfigured ? "active" : "inactive");
+      } catch (error) {
+        setEmailStatus("inactive");
+      }
+    };
+    fetchStatus();
+
     const interval = setInterval(() => {
       setLatency(prev => Math.max(12, Math.min(48, prev + (Math.random() * 4 - 2))));
     }, 3000);
@@ -25,6 +37,11 @@ export const SystemStatus = () => {
       <div className="flex items-center gap-2">
         <Zap size={10} className="text-accent" />
         <span>Latency: {latency.toFixed(0)}ms</span>
+      </div>
+      <div className="h-4 w-px bg-border" />
+      <div className="flex items-center gap-2">
+        <div className={`h-1.5 w-1.5 rounded-full ${emailStatus === "active" ? "bg-accent" : "bg-red-500"}`} />
+        <span>Email: {emailStatus === "active" ? "Active" : "Keys Missing"}</span>
       </div>
       <div className="h-4 w-px bg-border" />
       <div className="flex items-center gap-2 text-white">

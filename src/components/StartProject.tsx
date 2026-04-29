@@ -8,6 +8,7 @@ interface StartProjectProps {
 
 export const StartProject = ({ selectedTier }: StartProjectProps) => {
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -25,6 +26,7 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
     }
 
     setStatus("sending");
+    setErrorMessage(null);
 
     try {
       const response = await fetch("/api/contact", {
@@ -39,9 +41,12 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
       if (response.ok) {
         setStatus("success");
       } else {
+        const errorData = await response.json();
+        setErrorMessage(errorData.error || "We encountered a protocol error during transmission.");
         setStatus("error");
       }
     } catch (error) {
+      setErrorMessage("Network error: Connection to the server could not be established.");
       setStatus("error");
     }
   };
@@ -114,7 +119,7 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
                   <div>
                     <h3 className="text-white font-sans text-2xl font-bold uppercase tracking-tight mb-4">Connection Failed</h3>
                     <p className="text-neutral-400 font-sans text-sm leading-relaxed mb-8">
-                      We encountered a protocol error during transmission. Please verify your connection and try again.
+                      {errorMessage || "We encountered a protocol error during transmission. Please verify your connection and try again."}
                     </p>
                     <button 
                       onClick={closeModals}
