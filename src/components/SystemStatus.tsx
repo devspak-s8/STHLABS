@@ -9,7 +9,7 @@ export const SystemStatus = () => {
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const response = await fetch("/api/status");
+        const response = await fetch(`/api/status?t=${Date.now()}`);
         const data = await response.json();
         setEmailStatus(data.emailConfigured ? "active" : "inactive");
       } catch (error) {

@@ -2,6 +2,9 @@ import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
 import { Resend } from "resend";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 async function startServer() {
   const app = express();
@@ -111,6 +114,10 @@ async function startServer() {
 
   app.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running at http://localhost:${PORT}`);
+    console.log(`Email Service Status: ${process.env.RESEND_API_KEY ? "CONFIGURED" : "MISSING"}`);
+    if (!process.env.RESEND_API_KEY) {
+      console.warn("⚠️  RESEND_API_KEY is not set. Check your environment variables or .env file.");
+    }
   });
 }
 
