@@ -1,5 +1,6 @@
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 import React, { useState } from "react";
+import { Loader2, CheckCircle2, X } from "lucide-react";
 
 interface StartProjectProps {
   selectedTier: string | null;
@@ -13,8 +14,16 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
     message: ""
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    
+    // Check form validity before proceeding
+    const form = e.currentTarget;
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
+
     setStatus("sending");
 
     try {
@@ -29,7 +38,6 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
 
       if (response.ok) {
         setStatus("success");
-        setFormData({ name: "", email: "", message: "" });
       } else {
         setStatus("error");
       }
@@ -38,8 +46,90 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
     }
   };
 
+  const closeModals = () => {
+    if (status === "success") {
+      setFormData({ name: "", email: "", message: "" });
+    }
+    setStatus("idle");
+  };
+
   return (
     <section id="start-project" className="py-20 md:py-32 px-6 md:px-16 border-b border-border bg-[#0a0a0a] overflow-hidden">
+      {/* Loading/Status Modals */}
+      <AnimatePresence>
+        {status !== "idle" && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={status !== "sending" ? closeModals : undefined}
+              className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            />
+            
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-md bg-surface border border-border p-8 md:p-12 text-center"
+            >
+              {status === "sending" && (
+                <div className="flex flex-col items-center gap-6">
+                  <div className="relative">
+                    <Loader2 className="text-accent animate-spin w-12 h-12" />
+                    <div className="absolute inset-0 blur-xl bg-accent/20 animate-pulse" />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-sans text-xl font-bold uppercase tracking-widest mb-2">Transmitting Data</h3>
+                    <p className="text-neutral-500 font-mono text-[10px] uppercase">Securing uplink channel...</p>
+                  </div>
+                </div>
+              )}
+
+              {status === "success" && (
+                <div className="flex flex-col items-center gap-6">
+                  <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center">
+                    <CheckCircle2 className="text-black w-10 h-10" />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-sans text-2xl font-bold uppercase tracking-tight mb-4">Transmission Successful</h3>
+                    <p className="text-neutral-400 font-sans text-sm leading-relaxed mb-8">
+                      Your brief has been received by our engineering core. A senior systems protocol specialist will respond within 24 hours.
+                    </p>
+                    <button 
+                      onClick={closeModals}
+                      className="w-full bg-white text-black py-4 font-mono text-xs uppercase font-bold tracking-widest hover:bg-accent transition-colors"
+                    >
+                      Return to Terminal
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {status === "error" && (
+                <div className="flex flex-col items-center gap-6">
+                  <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center">
+                    <X className="text-white w-10 h-10" />
+                  </div>
+                  <div>
+                    <h3 className="text-white font-sans text-2xl font-bold uppercase tracking-tight mb-4">Connection Failed</h3>
+                    <p className="text-neutral-400 font-sans text-sm leading-relaxed mb-8">
+                      We encountered a protocol error during transmission. Please verify your connection and try again.
+                    </p>
+                    <button 
+                      onClick={closeModals}
+                      className="w-full bg-red-500 text-white py-4 font-mono text-xs uppercase font-bold tracking-widest hover:bg-red-600 transition-colors"
+                    >
+                      Retry Uplink
+                    </button>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-20 gap-4">
         <motion.h2 
           initial={{ opacity: 0, x: 50 }}
@@ -59,19 +149,7 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
         transition={{ duration: 0.8 }}
         className="max-w-2xl mx-auto w-full"
       >
-        {status === "success" ? (
-          <div className="bg-accent/10 border border-accent/20 p-8 text-center">
-            <h3 className="text-accent font-sans text-2xl font-medium mb-4 uppercase tracking-tight">Transmission Received</h3>
-            <p className="text-neutral-400 font-sans">We've received your requirements. A senior engineer will be in contact shortly.</p>
-            <button 
-              onClick={() => setStatus("idle")} 
-              className="mt-8 text-white font-mono text-xs underline uppercase tracking-widest"
-            >
-              Send another message
-            </button>
-          </div>
-        ) : (
-          <form className="space-y-6 md:space-y-10" onSubmit={handleSubmit}>
+        <form className="space-y-6 md:space-y-10" onSubmit={handleSubmit}>
             {selectedTier && (
               <motion.div 
                 initial={{ opacity: 0, x: -20 }}
@@ -109,6 +187,7 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
               <label className="block font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-neutral-500">Project Brief</label>
               <textarea 
                 required
+                minLength={20}
                 placeholder="Describe the systems design requirements..." 
                 rows={4} 
                 value={formData.message}
@@ -132,7 +211,6 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
               {status === "sending" ? "Transmitting..." : "Transmit Requirements"}
             </motion.button>
           </form>
-        )}
       </motion.div>
     </section>
   );

@@ -1,5 +1,6 @@
 import { motion, useSpring, useTransform, animate } from "motion/react";
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const AnimatedNumber = ({ value }: { value: number }) => {
   const [displayValue, setDisplayValue] = useState(0);
@@ -25,29 +26,60 @@ const rates = {
 const tiers = [
   {
     name: "System Blueprint",
-    price: 2500,
+    price: 1500,
     description: "Architectural consultation and technical design documentation.",
-    features: ["System Architecture Design", "Tech Stack Selection", "Security Audit Plan", "Scalability Roadmap"]
+    features: ["System Architecture Design", "Tech Stack Selection", "Security Audit Plan", "Scalability Roadmap"],
+    details: [
+      "Discovery sessions with senior architects",
+      "Full infrastructure diagram (High Level)",
+      "Detailed technology selection report",
+      "Database schema & API modeling",
+      "Draft security protocols & compliance check"
+    ]
   },
   {
     name: "Core MVP",
-    price: 8500,
+    price: 4500,
     description: "Complete engineering of a production-ready minimum viable product.",
     features: ["Custom Web/Mobile App", "Scalable Backend", "CI/CD Pipeline", "Basic Security Setup"],
-    popular: true
+    popular: true,
+    details: [
+      "Everything in Blueprint + Implementation",
+      "Fully functional cross-platform application",
+      "Express/Node.js or Go backend build",
+      "PostgreSQL/Redis database orchestration",
+      "Automated deployment workflows (CI/CD)",
+      "Initial load testing and optimization"
+    ]
   },
   {
     name: "Enterprise Engine",
-    price: 25000,
+    price: 12000,
     description: "Full-scale system engineering for complex organizational needs.",
-    features: ["Complex Integrations", "High-Load Optimization", "Custom Automations", "Dedicated Support"]
+    features: ["Complex Integrations", "High-Load Optimization", "Custom Automations", "Dedicated Support"],
+    details: [
+      "Everything in MVP + Enterprise Features",
+      "Microservices architecture implementation",
+      "Advanced Kubernetes orchestration",
+      "Zero-trust security implementation",
+      "Custom internal tooling & dashboards",
+      "24/7 uptime monitoring & auto-scaling",
+      "Dedicated senior engineering team"
+    ]
   },
   {
     name: "Custom Prototype",
     price: 0,
     isCustom: true,
     description: "Tailored engineering for specific one-off research or pilot tools.",
-    features: ["One-off Scripts", "Research Prototypes", "Manual Integrations", "Fixed Scope Build"]
+    features: ["One-off Scripts", "Research Prototypes", "Manual Integrations", "Fixed Scope Build"],
+    details: [
+      "Highly specific experimental projects",
+      "Rapid hardware-software integrations",
+      "Legacy system data extraction scripts",
+      "Proof of concept for niche technologies",
+      "Short-term specialized engineering"
+    ]
   }
 ];
 
@@ -134,7 +166,7 @@ export const Pricing = ({ onSelectTier }: PricingProps) => {
               <AnimatedNumber value={tier.features.length} /> Modules Included
             </div>
 
-            <ul className="space-y-3 md:space-y-4 mb-8 md:mb-10 flex-grow">
+            <ul className="space-y-3 md:space-y-4 mb-6 md:mb-8 flex-grow">
               {tier.features.map((feature) => (
                 <li key={feature} className="flex items-start gap-3">
                   <span className="w-1 md:w-1.5 h-1 md:h-1.5 bg-accent mt-1.5 shrink-0" />
@@ -143,14 +175,22 @@ export const Pricing = ({ onSelectTier }: PricingProps) => {
               ))}
             </ul>
 
-            <button 
-              onClick={() => scrollToContact(tier.name)}
-              className={`w-full py-4 font-mono text-[10px] font-medium uppercase tracking-widest transition-colors ${
-                tier.popular ? 'bg-accent text-black hover:bg-white' : 'bg-white text-black hover:bg-accent'
-              }`}
-            >
-              Select Tier
-            </button>
+            <div className="flex flex-col gap-3">
+              <Link 
+                to="/pricing"
+                className="w-full py-3 border border-border text-neutral-400 font-mono text-[9px] uppercase tracking-widest hover:text-white hover:border-neutral-500 transition-colors text-center"
+              >
+                View Full Breakdown
+              </Link>
+              <button 
+                onClick={() => scrollToContact(tier.name)}
+                className={`w-full py-4 font-mono text-[10px] font-medium uppercase tracking-widest transition-colors ${
+                  tier.popular ? 'bg-accent text-black hover:bg-white' : 'bg-white text-black hover:bg-accent'
+                }`}
+              >
+                Select Tier
+              </button>
+            </div>
           </motion.div>
         ))}
       </div>

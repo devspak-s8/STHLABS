@@ -3,7 +3,37 @@ import { motion } from "motion/react";
 export const Hero = () => {
   return (
     <section id="hero" className="relative pt-32 pb-20 md:pt-48 md:pb-32 px-6 md:px-16 border-b border-border min-h-[70vh] flex flex-col justify-center overflow-hidden">
-      <div className="absolute top-0 right-0 w-full md:w-1/2 h-full opacity-20 pointer-events-none" style={{ background: 'radial-gradient(circle at 60% 30%, #00F0FF 0%, transparent 70%)' }}></div>
+      {/* Dynamic Background Animation */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div 
+          animate={{
+            scale: [1, 1.2, 1],
+            opacity: [0.1, 0.2, 0.1],
+            x: [0, 50, 0],
+            y: [0, -30, 0],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          className="absolute -top-1/4 -left-1/4 w-[150%] h-[150%] bg-accent/20 blur-[120px] rounded-full"
+        />
+        <motion.div 
+          animate={{
+            scale: [1.2, 1, 1.2],
+            opacity: [0.05, 0.15, 0.05],
+            x: [0, -40, 0],
+            y: [0, 60, 0],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear"
+          }}
+          className="absolute -bottom-1/4 -right-1/4 w-[150%] h-[150%] bg-accent/10 blur-[120px] rounded-full"
+        />
+      </div>
       
       <motion.div 
         initial={{ opacity: 0, y: 20 }}

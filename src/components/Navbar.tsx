@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from "motion/react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, Zap, ArrowUpRight } from "lucide-react";
 
 const links = [
@@ -16,6 +17,9 @@ export const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
+  const location = useLocation();
+  const navigate = useNavigate();
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
@@ -27,6 +31,13 @@ export const Navbar = () => {
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     const id = href.replace('#', '');
+    
+    if (location.pathname !== '/') {
+      navigate('/' + href);
+      setIsMobileMenuOpen(false);
+      return;
+    }
+
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -35,6 +46,11 @@ export const Navbar = () => {
   };
 
   const scrollToContact = () => {
+    if (location.pathname !== '/') {
+      navigate('/#start-project');
+      setIsMobileMenuOpen(false);
+      return;
+    }
     document.getElementById('start-project')?.scrollIntoView({ behavior: 'smooth' });
     setIsMobileMenuOpen(false);
   };
@@ -48,10 +64,10 @@ export const Navbar = () => {
           : "bg-transparent border-b border-transparent"
       }`}
     >
-      <div id="logo" className="flex items-center gap-2 text-lg md:text-xl font-bold tracking-widest text-white uppercase shrink-0">
+      <Link to="/" id="logo" className="flex items-center gap-2 text-lg md:text-xl font-bold tracking-widest text-white uppercase shrink-0 hover:text-accent transition-colors">
         <Zap className="text-accent fill-accent" size={20} />
-        STH LABS
-      </div>
+        QUETTRIX LABS
+      </Link>
       
       {/* Desktop Links */}
       <div id="nav-links" className="hidden md:flex gap-6 lg:gap-8">

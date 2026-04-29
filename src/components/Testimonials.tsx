@@ -4,7 +4,7 @@ const quotes = [
   {
     author: "Elena Vance",
     role: "CTO, Vector Dynamics",
-    content: "STH LABS didn't just build our infrastructure; they re-architected our entire deployment strategy. Their systems handle peak loads with zero degradation."
+    content: "QUETTRIX LABS didn't just build our infrastructure; they re-architected our entire deployment strategy. Their systems handle peak loads with zero degradation."
   },
   {
     author: "Marcus Thorne",
