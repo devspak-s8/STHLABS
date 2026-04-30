@@ -39,7 +39,7 @@ async function startServer() {
 
     try {
       // Note: If using the free tier/sandbox, you can ONLY send to your own verified email.
-      const adminEmail = await resend.emails.send({
+      const adminEmailResponse = await resend.emails.send({
         from: 'QUETTRIX LABS <onboarding@resend.dev>',
         to: ['admin@provenly.live'],
         subject: `[SYSTEM ALERT] New Project Inquiry: ${tier || "Custom"}`,
@@ -57,8 +57,16 @@ async function startServer() {
         `,
       });
 
-      // 2. Send User Confirmation
-      const userEmail = await resend.emails.send({
+      if (adminEmailResponse.error) {
+        console.error("Resend API Error (Admin):", adminEmailResponse.error);
+        return res.status(400).json({ 
+          success: false, 
+          error: `Resend Error: ${adminEmailResponse.error.message}` 
+        });
+      }
+
+      // 2. Send User Confirmation (Will likely fail on Resend free tier unless they use a verified domain)
+      const userEmailResponse = await resend.emails.send({
         from: 'QUETTRIX LABS <onboarding@resend.dev>',
         to: [email],
         subject: `QUETTRIX LABS | Transmission Received: ${name}`,
@@ -91,10 +99,22 @@ async function startServer() {
         `,
       });
 
-      res.status(200).json({ success: true, adminEmail, userEmail });
+      if (userEmailResponse.error) {
+        console.warn("Resend API Warning (User):", userEmailResponse.error);
+        // We do not fail the request here, but log it because Free Tier limits sending to unverified emails
+      }
+
+      res.status(200).json({ 
+        success: true, 
+        adminEmail: adminEmailResponse.data, 
+        userEmail: userEmailResponse.data 
+      });
     } catch (error) {
-      console.error("Email error:", error);
-      res.status(500).json({ success: false, error: "Failed to send email" });
+      console.error("Email exception:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: error instanceof Error ? error.message : "An unexpected server error occurred." 
+      });
     }
   });
 
