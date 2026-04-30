@@ -31,11 +31,28 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
         }),
       });
 
-      if (response.ok) {
-        setStatus("success");
+      const contentType = response.headers.get("content-type");
+      if (response.ok && contentType && contentType.includes("application/json")) {
+        const data = await response.json();
+        if (data.success) {
+          setStatus("success");
+        } else {
+          setErrorMessage(data.error || "We encountered a protocol error during transmission.");
+          setStatus("error");
+        }
+      } else if (response.ok) {
+        // If response is OK but not JSON, it means Vercel routed to the frontend index.html fallback
+        setErrorMessage("Transmission endpoint not found (HTML returned). Check server configuration in Vercel.");
+        setStatus("error");
       } else {
-        const errorData = await response.json();
-        setErrorMessage(errorData.error || "We encountered a protocol error during transmission.");
+        let errorMsg = "We encountered a protocol error during transmission.";
+        if (contentType && contentType.includes("application/json")) {
+          const errorData = await response.json();
+          errorMsg = errorData.error || errorMsg;
+        } else {
+          errorMsg = `Server error ${response.status}: Endpoint is incorrectly configured.`;
+        }
+        setErrorMessage(errorMsg);
         setStatus("error");
       }
     } catch (error) {

@@ -11,15 +11,14 @@
       "config": { "distDir": "dist" }
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "server.ts"
+      "source": "/api/(.*)",
+      "destination": "/server.ts"
     },
     {
-      "src": "/(.*)",
-      "dest": "/$1",
-      "check": true
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }

@@ -39,7 +39,7 @@ app.post("/api/contact", async (req, res) => {
     // Note: If using the free tier/sandbox, you can ONLY send to your own verified email.
     const adminEmailResponse = await resend.emails.send({
       from: 'QUETTRIX LABS <onboarding@resend.dev>',
-      to: ['admin@provenly.live'],
+      to: [process.env.ADMIN_EMAIL || 'apatirasulayman@gmail.com'],
       subject: `[SYSTEM ALERT] New Project Inquiry: ${tier || "Custom"}`,
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #000; line-height: 1.6;">
