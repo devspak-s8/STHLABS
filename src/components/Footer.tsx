@@ -5,11 +5,14 @@ export const Footer = () => {
         © {new Date().getFullYear()} QUETTRIX LABS. ENGINEERED FOR PRECISION. ALL RIGHTS RESERVED.
       </div>
       <div className="flex gap-8">
-        <a href="#" className="font-mono text-[10px] tracking-widest uppercase text-neutral-500 hover:text-accent transition-colors">
+        <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="font-mono text-[10px] tracking-widest uppercase text-neutral-500 hover:text-accent transition-colors">
           Github
         </a>
-        <a href="#" className="font-mono text-[10px] tracking-widest uppercase text-neutral-500 hover:text-accent transition-colors">
+        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="font-mono text-[10px] tracking-widest uppercase text-neutral-500 hover:text-accent transition-colors">
           LinkedIn
+        </a>
+        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="font-mono text-[10px] tracking-widest uppercase text-neutral-500 hover:text-accent transition-colors">
+          Twitter
         </a>
         <a href="#" className="font-mono text-[10px] tracking-widest uppercase text-neutral-500 hover:text-accent transition-colors">
           Privacy

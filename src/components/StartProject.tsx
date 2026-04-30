@@ -18,13 +18,6 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
-    // Check form validity before proceeding
-    const form = e.currentTarget;
-    if (!form.checkValidity()) {
-      form.reportValidity();
-      return;
-    }
-
     setStatus("sending");
     setErrorMessage(null);
 
@@ -192,7 +185,6 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
               <label className="block font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-neutral-500">Project Brief</label>
               <textarea 
                 required
-                minLength={20}
                 placeholder="Describe the systems design requirements..." 
                 rows={4} 
                 value={formData.message}
