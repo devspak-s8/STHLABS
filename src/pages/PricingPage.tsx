@@ -6,7 +6,7 @@ import { ArrowLeft, Check, Zap, Cpu, Shield, Activity, Database, GitBranch } fro
 const tiers = [
   {
     name: "System Blueprint",
-    price: 1500,
+    price: 500,
     icon: <Cpu className="w-8 h-8 text-accent" />,
     description: "Deep-level architectural planning for complex systems.",
     longDescription: "Our Blueprint service is for founders who need a rock-solid foundation before a single line of code is written. We analyze your requirements through the lens of scalability, security, and maintainability.",
@@ -31,7 +31,7 @@ const tiers = [
   },
   {
     name: "Core MVP",
-    price: 4500,
+    price: 1500,
     icon: <Zap className="w-8 h-8 text-accent" />,
     popular: true,
     description: "Full-cycle engineering of a functional, production-ready product.",
@@ -57,7 +57,7 @@ const tiers = [
   },
   {
     name: "Enterprise Engine",
-    price: 12000,
+    price: 5000,
     icon: <Shield className="w-8 h-8 text-accent" />,
     description: "Multi-service infrastructure for large-scale organizational systems.",
     longDescription: "For scale-ups and enterprises, we provide orchestration for fragmented systems. We turn complexity into a unified, high-performance engine using microservices and custom internal tooling.",

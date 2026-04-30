@@ -26,7 +26,7 @@ const rates = {
 const tiers = [
   {
     name: "System Blueprint",
-    price: 1500,
+    price: 500,
     description: "Architectural consultation and technical design documentation.",
     features: ["System Architecture Design", "Tech Stack Selection", "Security Audit Plan", "Scalability Roadmap"],
     details: [
@@ -39,7 +39,7 @@ const tiers = [
   },
   {
     name: "Core MVP",
-    price: 4500,
+    price: 1500,
     description: "Complete engineering of a production-ready minimum viable product.",
     features: ["Custom Web/Mobile App", "Scalable Backend", "CI/CD Pipeline", "Basic Security Setup"],
     popular: true,
@@ -54,7 +54,7 @@ const tiers = [
   },
   {
     name: "Enterprise Engine",
-    price: 12000,
+    price: 5000,
     description: "Full-scale system engineering for complex organizational needs.",
     features: ["Complex Integrations", "High-Load Optimization", "Custom Automations", "Dedicated Support"],
     details: [
