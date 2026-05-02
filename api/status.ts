@@ -7,8 +7,15 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
+  if (!process.env.RESEND_API_KEY) {
+    return res.status(503).json({
+      error: "Service Unavailable: Configuration missing",
+      emailConfigured: false
+    });
+  }
+
   return res.status(200).json({
-    emailConfigured: !!process.env.RESEND_API_KEY,
+    emailConfigured: true,
     environment: process.env.NODE_ENV || "development",
     timestamp: new Date().toISOString()
   });

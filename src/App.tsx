@@ -12,6 +12,7 @@ import { SplashScreen } from "./components/SplashScreen";
 import { HomePage } from "./pages/HomePage";
 import { PricingPage } from "./pages/PricingPage";
 import { useState, useEffect } from "react";
+import { Analytics } from "@vercel/analytics/react";
 
 function AppContent() {
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
@@ -41,6 +42,7 @@ function AppContent() {
       </Routes>
       
       <Footer />
+      <Analytics />
     </div>
   );
 }
