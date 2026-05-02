@@ -107,15 +107,15 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
                     <CheckCircle2 className="text-black w-10 h-10" />
                   </div>
                   <div>
-                    <h3 className="text-white font-sans text-2xl font-bold uppercase tracking-tight mb-4">Transmission Successful</h3>
+                    <h3 className="text-white font-sans text-2xl font-bold uppercase tracking-tight mb-4">Message Sent</h3>
                     <p className="text-neutral-400 font-sans text-sm leading-relaxed mb-8">
-                      Your brief has been received by our engineering core. A senior systems protocol specialist will respond within 24 hours.
+                      We have received your project details. Our team will review them and get back to you within 24 hours.
                     </p>
                     <button 
                       onClick={closeModals}
                       className="w-full bg-white text-black py-4 font-mono text-xs uppercase font-bold tracking-widest hover:bg-accent transition-colors"
                     >
-                      Return to Terminal
+                      Back to Site
                     </button>
                   </div>
                 </div>
@@ -127,15 +127,15 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
                     <X className="text-white w-10 h-10" />
                   </div>
                   <div>
-                    <h3 className="text-white font-sans text-2xl font-bold uppercase tracking-tight mb-4">Connection Failed</h3>
+                    <h3 className="text-white font-sans text-2xl font-bold uppercase tracking-tight mb-4">Send Failed</h3>
                     <p className="text-neutral-400 font-sans text-sm leading-relaxed mb-8">
-                      {errorMessage || "We encountered a protocol error during transmission. Please verify your connection and try again."}
+                      {errorMessage || "There was an error sending your message. Please check your connection and try again."}
                     </p>
                     <button 
                       onClick={closeModals}
                       className="w-full bg-red-500 text-white py-4 font-mono text-xs uppercase font-bold tracking-widest hover:bg-red-600 transition-colors"
                     >
-                      Retry Uplink
+                      Try Again
                     </button>
                   </div>
                 </div>
@@ -152,7 +152,7 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
           viewport={{ once: true }}
           className="font-sans text-3xl md:text-5xl font-medium text-white tracking-tight uppercase"
         >
-          Initiate Protocol
+          Work With Us
         </motion.h2>
         <span className="font-mono text-xs text-neutral-500 tracking-tighter">[ 04 ]</span>
       </div>
@@ -171,13 +171,13 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
                 animate={{ opacity: 1, x: 0 }}
                 className="bg-accent/10 border border-accent/20 p-4 mb-4 flex items-center justify-between"
               >
-                <div className="font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-accent">Selected Configuration</div>
+                <div className="font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-accent">Selected Project Tier</div>
                 <div className="font-sans text-xs md:text-sm font-medium text-white">{selectedTier}</div>
               </motion.div>
             )}
             
             <div className="space-y-3 md:space-y-4">
-              <label className="block font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-neutral-500">Contact Identity</label>
+              <label className="block font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-neutral-500">Full Name</label>
               <input 
                 required
                 type="text" 
@@ -188,7 +188,7 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
               />
             </div>
             <div className="space-y-3 md:space-y-4">
-              <label className="block font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-neutral-500">Secure Channel (Email)</label>
+              <label className="block font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-neutral-500">Email Address</label>
               <input 
                 required
                 type="email" 
@@ -199,10 +199,10 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
               />
             </div>
             <div className="space-y-3 md:space-y-4">
-              <label className="block font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-neutral-500">Project Brief</label>
+              <label className="block font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-neutral-500">Project Details</label>
               <textarea 
                 required
-                placeholder="Describe the systems design requirements..." 
+                placeholder="Tell us about your project..." 
                 rows={4} 
                 value={formData.message}
                 onChange={(e) => setFormData({...formData, message: e.target.value})}
@@ -211,7 +211,7 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
             </div>
             
             {status === "error" && (
-              <p className="text-red-500 font-mono text-[10px] uppercase tracking-widest">Error: Transmission interrupted. Please retry.</p>
+              <p className="text-red-500 font-mono text-[10px] uppercase tracking-widest">Error sending message. Please try again.</p>
             )}
 
             <motion.button 
@@ -222,7 +222,7 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
                 status === "sending" ? "bg-accent/50 text-black cursor-not-allowed" : "bg-white text-black hover:bg-accent"
               }`}
             >
-              {status === "sending" ? "Transmitting..." : "Transmit Requirements"}
+              {status === "sending" ? "Sending..." : "Submit Project"}
             </motion.button>
           </form>
       </motion.div>

@@ -4,20 +4,20 @@ import { Plus, Minus } from "lucide-react";
 
 const faqs = [
   {
-    question: "How long does a typical system overhaul take?",
-    answer: "Most MVP projects launch within 4-8 weeks. Deep architectural overhauls for enterprise systems typically range from 3-6 months depending on legacy complexity."
+    question: "How long does a typical project take?",
+    answer: "Most small projects are ready in 4-8 weeks. Larger, more complex custom software can take between 3-6 months depending on what you need built."
   },
   {
-    question: "Do you provide ongoing maintenance after deployment?",
-    answer: "Yes. We offer 'Engine Health' retainers that include 24/7 monitoring, security patching, and scaling assistance as your user base grows."
+    question: "Do you offer support after the site is finished?",
+    answer: "Yes, we provide ongoing support and maintenance packages to keep your software running smoothly, handle updates, and fix any issues that pop up."
   },
   {
-    question: "Can you work with our existing legacy tech stack?",
-    answer: "Absolutely. We specialize in modernization—safely migrating legacy COBOL or PHP systems to modern, high-performance distributed architectures without downtime."
+    question: "Can you help me update my old website or software?",
+    answer: "Definitely. We specialize in taking older systems and giving them a fresh, modern update that works better and faster."
   },
   {
-    question: "What is your security protocol for sensitive financial data?",
-    answer: "We implement SOC2-compliant engineering patterns, including zero-trust networking, field-level encryption, and automated vulnerability scanning in our CI/CD pipelines."
+    question: "Is my data and project secure?",
+    answer: "Security is our top priority. We use modern industry standards to protect your data and ensure your application is safe from unauthorized access."
   }
 ];
 
@@ -27,7 +27,7 @@ export const FAQ = () => {
   return (
     <section id="faq" className="py-20 md:py-32 px-6 md:px-16 border-b border-border bg-background">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 md:mb-20 gap-4">
-        <h2 className="font-sans text-3xl md:text-5xl font-medium text-white tracking-tight uppercase">Knowledge Base</h2>
+        <h2 className="font-sans text-3xl md:text-5xl font-medium text-white tracking-tight uppercase">Common Questions</h2>
         <span className="font-mono text-xs text-neutral-500 tracking-tighter">[ 08 ]</span>
       </div>
 

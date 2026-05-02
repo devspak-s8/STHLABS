@@ -25,46 +25,46 @@ const rates = {
 
 const tiers = [
   {
-    name: "System Blueprint",
+    name: "Strategic Launchpad",
     price: 500,
-    description: "Architectural consultation and technical design documentation.",
-    features: ["System Architecture Design", "Tech Stack Selection", "Security Audit Plan", "Scalability Roadmap"],
+    description: "Perfect for planning your project's foundation and long-term scaling strategy.",
+    features: ["Strategic Design Planning", "Technology Selection", "Security Review", "Growth Roadmap"],
     details: [
-      "Discovery sessions with senior architects",
-      "Full infrastructure diagram (High Level)",
-      "Detailed technology selection report",
-      "Database schema & API modeling",
-      "Draft security protocols & compliance check"
+      "Strategy sessions with our lead designers",
+      "Comprehensive technical planning report",
+      "Optimal technology & stack selection",
+      "Database design & user flow mapping",
+      "Security best practices & compliance guide"
     ]
   },
   {
-    name: "Core MVP",
+    name: "Product Accelerator",
     price: 1500,
-    description: "Complete engineering of a production-ready minimum viable product.",
-    features: ["Custom Web/Mobile App", "Scalable Backend", "CI/CD Pipeline", "Basic Security Setup"],
+    description: "A complete, high-performance product built and ready for your first users.",
+    features: ["Custom App Development", "Reliable Backend", "Automated Updates", "Advanced Security"],
     popular: true,
     details: [
-      "Everything in Blueprint + Implementation",
-      "Fully functional cross-platform application",
-      "Express/Node.js or Go backend build",
-      "PostgreSQL/Redis database orchestration",
-      "Automated deployment workflows (CI/CD)",
-      "Initial load testing and optimization"
+      "Everything in Strategic Launchpad + Full Build",
+      "Complete custom web application",
+      "Scalable backend infrastructure",
+      "Database setup and optimization",
+      "Automated deployment workflows",
+      "Performance testing and launch readiness"
     ]
   },
   {
-    name: "Enterprise Engine",
+    name: "Growth Engine",
     price: 5000,
-    description: "Full-scale system engineering for complex organizational needs.",
-    features: ["Complex Integrations", "High-Load Optimization", "Custom Automations", "Dedicated Support"],
+    description: "Enterprise-grade software designed for complex teams and high-traffic needs.",
+    features: ["Custom Integrations", "Performance Optimization", "Workflow Automation", "Priority Support"],
     details: [
-      "Everything in MVP + Enterprise Features",
-      "Microservices architecture implementation",
-      "Advanced Kubernetes orchestration",
-      "Zero-trust security implementation",
-      "Custom internal tooling & dashboards",
-      "24/7 uptime monitoring & auto-scaling",
-      "Dedicated senior engineering team"
+      "Everything in Product Accelerator + Scaling",
+      "Custom internal tools and employee dashboards",
+      "Advanced multi-user systems",
+      "Enterprise-level security audits",
+      "Third-party software integrations (ERP/CRM)",
+      "24/7 monitoring and auto-scaling support",
+      "Dedicated senior support team"
     ]
   },
   {

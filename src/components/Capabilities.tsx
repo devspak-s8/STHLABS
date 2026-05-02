@@ -4,23 +4,23 @@ import { motion } from "motion/react";
 const capabilities = [
   {
     icon: <Terminal size={32} />,
-    title: "MVP Development",
-    description: "Rapid prototyping and development of functional MVPs designed to validate core hypotheses without sacrificing architectural integrity."
+    title: "Web App Development",
+    description: "We build fast, reliable web applications designed to handle growth and provide a seamless experience for your users."
   },
   {
     icon: <Server size={32} />,
-    title: "Backend Systems & APIs",
-    description: "Robust, scalable server-side architectures and RESTful/GraphQL API development tailored for high-throughput environments."
+    title: "Backend & Internal Tools",
+    description: "Robust server systems and custom dashboards built to automate your business processes and manage complex data."
   },
   {
     icon: <Code size={32} />,
-    title: "Automation Scripts",
-    description: "Custom scripting and workflow automation to eliminate operational bottlenecks and streamline repetitive technical processes."
+    title: "Workflow Automation",
+    description: "Custom scripts and automated workflows that eliminate manual work and keep your team focused on what matters."
   },
   {
     icon: <Layout size={32} />,
-    title: "Product Architecture",
-    description: "Strategic technical planning and system design to ensure long-term scalability, maintainability, and security."
+    title: "Digital Product Strategy",
+    description: "Strategic planning and technical design to ensure your product is scalable, secure, and ready for the future."
   }
 ];
 

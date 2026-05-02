@@ -44,16 +44,16 @@ export const Hero = () => {
         <div className="inline-flex items-center gap-2 border border-border px-3 py-1.5 mb-6 md:mb-8 bg-surface/50">
           <span className="w-1.5 h-1.5 md:w-2 md:h-2 bg-accent shadow-[0_0_8px_#00F0FF]"></span>
           <span className="font-mono text-[9px] md:text-xs font-medium tracking-[0.15em] text-neutral-300 uppercase">
-            SYSTEMS ENGINEERING AGENCY
+            Product Design & Development Agency
           </span>
         </div>
         
         <h1 className="font-sans text-4xl sm:text-5xl md:text-7xl font-semibold text-white mb-6 md:mb-8 leading-[1.1] tracking-tight">
-          Building production-ready systems for serious founders
+          Building high-performance apps for ambitious founders
         </h1>
         
         <p className="font-sans text-base md:text-xl text-neutral-400 max-w-2xl mb-8 md:mb-12 leading-relaxed">
-          We design and engineer scalable applications, backend systems, and automation tools — built for real-world use, not demos.
+          We design and build reliable web applications, internal tools, and custom software that work at scale.
         </p>
         
         <div className="flex flex-col sm:flex-row gap-4">

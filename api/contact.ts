@@ -52,30 +52,36 @@ export default async function handler(req: any, res: any) {
       });
     }
 
-    // 2. Attempt to send confirmation to user (Will likely fail on Free Tier)
-    // We wrap this in a separate try/catch so to not fail the whole request
+    // 2. Attempt to send confirmation to user
+    // IMPORTANT: On Resend Free/Onboarding tier, you can ONLY send to your own registered email.
+    // To send to any user, you MUST verify a domain in Resend: https://resend.com/domains
     try {
       if (email !== adminEmail) {
-        await resend.emails.send({
-          from: 'QUETTRIX LABS <onboarding@resend.dev>',
+        console.log(`Attempting user confirmation to: ${email}`);
+        const userConfirmation = await resend.emails.send({
+          from: 'QUETTRIX <onboarding@resend.dev>',
           to: [email],
-          subject: `QUETTRIX LABS | Transmission Received: ${name}`,
+          subject: "We've received your request - QUETTRIX",
           html: `
-            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; color: #000; line-height: 1.6; border: 1px solid #eee; padding: 40px;">
-              <div style="background: #000; color: #fff; padding: 20px; text-align: center; margin-bottom: 40px;">
-                <h1 style="margin: 0; letter-spacing: 5px; font-size: 24px;">QUETTRIX LABS</h1>
-                <p style="margin: 5px 0 0 0; font-size: 10px; text-transform: uppercase; opacity: 0.7;">Engineered for Precision</p>
-              </div>
-              <p>Protocol Initialized, <strong>${name}</strong>.</p>
-              <p>We have successfully received your project requirements for the <strong>${tier || "Custom Strategy"}</strong> tier.</p>
-              <p style="font-size: 14px; color: #666;">A systems architect will be in contact via this secure channel within 24 hours.</p>
+            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee;">
+              <h2 style="color: #333;">Hello ${name},</h2>
+              <p>Thanks for reaching out to us about your project.</p>
+              <p>We've received your details for the <strong>${tier || "Custom"}</strong> package. Our team will review everything and get back to you within 24 hours.</p>
+              <br />
+              <p>Best regards,<br /><strong>The QUETTRIX Team</strong></p>
             </div>
           `,
         });
+
+        if (userConfirmation.error) {
+          // This will log the specific "Sandbox" error if you're on a free tier
+          console.error("Resend blocked user email:", userConfirmation.error);
+        } else {
+          console.log("User confirmation sent successfully.");
+        }
       }
     } catch (userEmailErr) {
-      console.warn("User confirmation suppressed (likely due to Resend Free Tier restrictions):", userEmailErr);
-      // We don't return an error here because the admin already got the lead!
+      console.error("Unexpected error sending user email:", userEmailErr);
     }
 
     return res.status(200).json({

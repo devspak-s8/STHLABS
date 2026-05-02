@@ -3,18 +3,18 @@ import { motion } from "motion/react";
 const quotes = [
   {
     author: "Elena Vance",
-    role: "CTO, Vector Dynamics",
-    content: "QUETTRIX LABS didn't just build our infrastructure; they re-architected our entire deployment strategy. Their systems handle peak loads with zero degradation."
+    role: "Proprietor, Vance & Co.",
+    content: "The team at QUETTRIX didn't just build our website; they made the whole process simple and stress-free. Our new platform works perfectly even when we're busy."
   },
   {
     author: "Marcus Thorne",
-    role: "Founder, BlackBox AI",
-    content: "The level of technical rigor is refreshing. No fluff, just production-grade systems that actually scale. They are true engineers' engineers."
+    role: "Founder, Thorne Creative",
+    content: "Professional, straightforward, and highly skilled. They built exactly what we needed without any tech jargon. Truly great to work with."
   },
   {
     author: "Sarah Jenkins",
-    role: "Head of Engineering, CloudScale",
-    content: "Moving our legacy architecture to their kubernetes-native stack reduced our operational costs by 40%. The ROI was immediate."
+    role: "Director, Peak Performance",
+    content: "The new internal tools they built have saved our team hours of work every week. It was a great investment for our business."
   }
 ];
 
@@ -28,7 +28,7 @@ export const Testimonials = () => {
           viewport={{ once: true }}
           className="font-sans text-3xl md:text-5xl font-medium text-white tracking-tight uppercase"
         >
-          Industry Praise
+          What People Say
         </motion.h2>
         <span className="font-mono text-xs text-neutral-500 tracking-tighter">[ 07 ]</span>
       </div>

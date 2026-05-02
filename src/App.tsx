@@ -7,7 +7,6 @@ import { BrowserRouter as Router, Routes, Route, useSearchParams } from "react-r
 import { Navbar } from "./components/Navbar";
 import { Footer } from "./components/Footer";
 import { BackToTop } from "./components/BackToTop";
-import { SystemStatus } from "./components/SystemStatus";
 import { SplashScreen } from "./components/SplashScreen";
 import { HomePage } from "./pages/HomePage";
 import { PricingPage } from "./pages/PricingPage";
@@ -34,7 +33,6 @@ function AppContent() {
       <SplashScreen />
       <Navbar />
       <BackToTop />
-      <SystemStatus />
       
       <Routes>
         <Route path="/" element={<HomePage selectedTier={selectedTier} setSelectedTier={setSelectedTier} />} />

@@ -5,11 +5,11 @@ import { Menu, X, Zap, ArrowUpRight } from "lucide-react";
 
 const links = [
   { name: "Services", href: "#services" },
-  { name: "Work", href: "#work" },
-  { name: "Process", href: "#process" },
+  { name: "Portfolio", href: "#work" },
+  { name: "How we work", href: "#process" },
   { name: "Pricing", href: "#pricing" },
-  { name: "FAQ", href: "#faq" },
-  { name: "Tech", href: "#tech" },
+  { name: "Common Questions", href: "#faq" },
+  { name: "Tools", href: "#tech" },
 ];
 
 export const Navbar = () => {

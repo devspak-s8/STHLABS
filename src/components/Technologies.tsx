@@ -15,7 +15,7 @@ export const Technologies = () => {
           viewport={{ once: true }}
           className="font-sans text-3xl md:text-4xl font-medium text-white tracking-tight uppercase"
         >
-          Tech Stack
+          Tools We Use
         </motion.h2>
         <span className="font-mono text-xs text-neutral-500 tracking-tighter">[ 03 ]</span>
       </div>

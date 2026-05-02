@@ -10,7 +10,7 @@ export const FinalCTA = () => {
         transition={{ duration: 0.6 }}
       >
         <h2 className="font-sans text-4xl md:text-6xl font-semibold text-white mb-12 tracking-tight">
-          Let’s build something real.
+          Ready to start your next project?
         </h2>
         <button 
           onClick={() => document.getElementById('start-project')?.scrollIntoView({ behavior: 'smooth' })}

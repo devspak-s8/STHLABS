@@ -2,7 +2,7 @@ export const Footer = () => {
   return (
     <footer className="bg-background border-t border-border px-8 md:px-16 py-12 flex flex-col md:flex-row justify-between items-center gap-8">
       <div className="text-neutral-500 font-mono text-[10px] tracking-[0.2em] uppercase text-center md:text-left">
-        © {new Date().getFullYear()} QUETTRIX LABS. ENGINEERED FOR PRECISION. ALL RIGHTS RESERVED.
+        © {new Date().getFullYear()} QUETTRIX LABS. BUILT FOR PEOPLE. ALL RIGHTS RESERVED.
       </div>
       <div className="flex gap-8">
         <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="font-mono text-[10px] tracking-widest uppercase text-neutral-500 hover:text-accent transition-colors">

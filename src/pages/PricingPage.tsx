@@ -5,78 +5,78 @@ import { ArrowLeft, Check, Zap, Cpu, Shield, Activity, Database, GitBranch } fro
 
 const tiers = [
   {
-    name: "System Blueprint",
+    name: "Strategic Launchpad",
     price: 500,
     icon: <Cpu className="w-8 h-8 text-accent" />,
-    description: "Deep-level architectural planning for complex systems.",
-    longDescription: "Our Blueprint service is for founders who need a rock-solid foundation before a single line of code is written. We analyze your requirements through the lens of scalability, security, and maintainability.",
+    description: "A solid plan for your project's foundation and growth.",
+    longDescription: "Our Launchpad service is for founders who want to get things right from day one. We analyze your requirements to ensure your product is built for scale, security, and long-term success.",
     modules: [
       {
-        title: "Infrastructure Mapping",
-        desc: "High-level visual representation of your system's components, data flow, and external integrations.",
+        title: "Product Roadmap",
+        desc: "A clear visual plan of your project's features, data flow, and third-party integrations.",
       },
       {
-        title: "Tech Stack Validation",
-        desc: "Selecting the optimal database (PostgreSQL, Redis, Vector), language (Go, Node.js), and cloud provider (GCP, AWS).",
+        title: "Technology Strategy",
+        desc: "Selecting the best-fit database, language, and hosting providers for your specific needs.",
       },
       {
-        title: "Security & Compliance",
-        desc: "Drafting zero-trust architecture protocols and ensuring your roadmap meets industry standards (SOC2, GDPR ready).",
+        title: "Security Planning",
+        desc: "Designing secure data handling and user authentication protocols to keep your business safe.",
       },
       {
-        title: "Execution Roadmap",
-        desc: "A phase-by-phase development plan with estimated timelines and resource requirements.",
+        title: "Growth Strategy",
+        desc: "A phase-by-phase development plan with clear timelines and recommended resources.",
       }
     ]
   },
   {
-    name: "Core MVP",
+    name: "Product Accelerator",
     price: 1500,
     icon: <Zap className="w-8 h-8 text-accent" />,
     popular: true,
-    description: "Full-cycle engineering of a functional, production-ready product.",
-    longDescription: "We don't build typical 'low-code' MVPs. We build hardened server-side engines and fluid client interfaces designed to survive their first 10,000 users without refactoring.",
+    description: "A complete, high-performance product built to grow.",
+    longDescription: "We build more than just MVPs. We build reliable, fast, and secure products that allow you to focus on growing your business without worrying about technical debt.",
     modules: [
       {
-        title: "Full-Stack Development",
-        desc: "End-to-end implementation using React/Vite and specialized backend frameworks.",
+        title: "Custom Development",
+        desc: "Full-scale building of your web application using modern, high-performance frameworks.",
       },
       {
-        title: "API Orchestration",
-        desc: "REST or GraphQL API cores with automated documentation and type-safety.",
+        title: "Feature Development",
+        desc: "Building out the core functionality your users need with clean, maintainable code.",
       },
       {
-        title: "Database Engineering",
-        desc: "Advanced schema design, indexing strategies, and automated migrations.",
+        title: "Database Setup",
+        desc: "Designing and implementing a database that can handle your users and data reliably.",
       },
       {
-        title: "CI/CD & DevOps",
-        desc: "Automated testing and deployment pipelines for zero-downtime releases.",
+        title: "Automated Launch",
+        desc: "Setting up professional deployment pipelines for seamless, worry-free updates.",
       }
     ]
   },
   {
-    name: "Enterprise Engine",
+    name: "Growth Engine",
     price: 5000,
     icon: <Shield className="w-8 h-8 text-accent" />,
-    description: "Multi-service infrastructure for large-scale organizational systems.",
-    longDescription: "For scale-ups and enterprises, we provide orchestration for fragmented systems. We turn complexity into a unified, high-performance engine using microservices and custom internal tooling.",
+    description: "Enterprise software for complex business needs and high traffic.",
+    longDescription: "For growing teams and established companies. We build custom internal tools, complex integrations, and large-scale systems that turn fragmented processes into high-performance engines.",
     modules: [
       {
-        title: "Microservices Architecture",
-        desc: "Decoupled services communicating via gRPC or message queues for maximum fault tolerance.",
+        title: "Advanced Dashboards",
+        desc: "Custom internal software and management tools designed specifically for your team's workflow.",
       },
       {
-        title: "Global Scalability",
-        desc: "Multi-region deployments and edge computing setup for global low-latency.",
+        title: "System Integration",
+        desc: "Connecting your custom software with your current tools, ERPs, and external platforms.",
       },
       {
-        title: "Advanced Observability",
-        desc: "Real-time monitoring, distributed tracing, and automated alerting systems.",
+        title: "Monitoring & Uptime",
+        desc: "Real-time alerts and professional oversight to ensure your systems never go dark.",
       },
       {
-        title: "Custom Integrations",
-        desc: "Deep-level connections with legacy systems, ERPs, and complex third-party platforms.",
+        title: "Priority Partnership",
+        desc: "Direct access to our senior team for continuous improvement and high-priority requests.",
       }
     ]
   }
@@ -97,7 +97,7 @@ export const PricingPage = () => {
           className="inline-flex items-center gap-2 text-neutral-500 hover:text-accent font-mono text-xs uppercase tracking-widest mb-12 transition-colors group"
         >
           <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-          Back to Terminal
+          Back to Home
         </Link>
 
         <header className="mb-20">
@@ -106,10 +106,10 @@ export const PricingPage = () => {
             animate={{ opacity: 1, y: 0 }}
             className="text-4xl md:text-6xl font-sans font-bold text-white mb-6 uppercase tracking-tight"
           >
-            Tier <span className="text-accent underline">Breakdown</span>
+            Tier <span className="text-accent underline">Details</span>
           </motion.h1>
           <p className="text-neutral-400 text-lg md:text-xl font-sans max-w-2xl leading-relaxed">
-            Every project begins with a protocol assessment. Choose the tier that matches your system's current complexity requirements.
+            Every project begins with understanding your goals. Choose the tier that matches your current business needs.
           </p>
         </header>
 
@@ -140,7 +140,7 @@ export const PricingPage = () => {
                   onClick={() => navigate(`/?tier=${encodeURIComponent(tier.name)}#start-project`)}
                   className="w-full bg-white text-black py-4 font-mono text-xs font-bold uppercase tracking-widest hover:bg-accent transition-colors"
                 >
-                  Initiate Project
+                  Start Project
                 </button>
               </div>
 
