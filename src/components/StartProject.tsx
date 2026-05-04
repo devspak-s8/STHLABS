@@ -1,6 +1,9 @@
 import { motion, AnimatePresence } from "motion/react";
-import React, { useState } from "react";
-import { Loader2, CheckCircle2, X } from "lucide-react";
+import React, { useState, useEffect, useRef } from "react";
+import { Loader2, CheckCircle2, X, Sparkles } from "lucide-react";
+import { GoogleGenAI } from "@google/genai";
+
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 interface StartProjectProps {
   selectedTier: string | null;
@@ -14,6 +17,57 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
     email: "",
     message: ""
   });
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [isGeneratingSuggestions, setIsGeneratingSuggestions] = useState(false);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    // Only generate suggestions if user has typed enough and not too much
+    if (formData.message.length > 10 && formData.message.length < 150) {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+      
+      debounceRef.current = setTimeout(async () => {
+        setIsGeneratingSuggestions(true);
+        try {
+          const response = await ai.models.generateContent({
+            model: "gemini-3-flash-preview",
+            contents: `The following is a partial project description for a software engineering lab. Based on this, provide 3 short, professional completions or expansions (max 8 words each) to help the user refine their request. Return ONLY a JSON array of 3 strings.
+            
+            Current text: "${formData.message}"`,
+            config: {
+              responseMimeType: "application/json",
+            }
+          });
+          
+          if (response.text) {
+            try {
+              const data = JSON.parse(response.text.trim());
+              if (Array.isArray(data)) {
+                setSuggestions(data);
+              }
+            } catch (e) {
+              console.error("JSON parse error:", e);
+              // Fallback: try to match array pattern if JSON parse fails
+              const match = response.text.match(/\[.*\]/s);
+              if (match) {
+                setSuggestions(JSON.parse(match[0]));
+              }
+            }
+          }
+        } catch (error) {
+          console.error("Gemini context error:", error);
+        } finally {
+          setIsGeneratingSuggestions(false);
+        }
+      }, 1000); // 1s debounce
+    } else if (formData.message.length <= 10) {
+      setSuggestions([]);
+    }
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [formData.message]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -109,7 +163,7 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
                   <div>
                     <h3 className="text-white font-sans text-2xl font-bold uppercase tracking-tight mb-4">Message Sent</h3>
                     <p className="text-neutral-400 font-sans text-sm leading-relaxed mb-8">
-                      We have received your project details. Our team will review them and get back to you within 24 hours.
+                      We have received your project details. You will be contacted within 20 minutes, and a call will be scheduled very soon. Please check your email within the next 20 minutes for further instructions.
                     </p>
                     <button 
                       onClick={closeModals}
@@ -199,7 +253,15 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
               />
             </div>
             <div className="space-y-3 md:space-y-4">
-              <label className="block font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-neutral-500">Project Details</label>
+              <div className="flex justify-between items-center">
+                <label className="block font-mono text-[9px] md:text-[10px] uppercase tracking-widest text-neutral-500">Project Details</label>
+                {isGeneratingSuggestions && (
+                  <div className="flex items-center gap-1">
+                    <Loader2 size={8} className="animate-spin text-accent" />
+                    <span className="font-mono text-[7px] uppercase text-accent/60 tracking-wider">Analyzing context...</span>
+                  </div>
+                )}
+              </div>
               <textarea 
                 required
                 placeholder="Tell us about your project..." 
@@ -208,6 +270,35 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
                 onChange={(e) => setFormData({...formData, message: e.target.value})}
                 className="w-full bg-surface/50 border-b border-border p-4 font-sans text-white focus:outline-none focus:border-accent transition-colors resize-none rounded-none" 
               />
+              <AnimatePresence>
+                {suggestions.length > 0 && (
+                  <motion.div 
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    className="flex flex-wrap gap-2 pt-2"
+                  >
+                    <div className="w-full flex items-center gap-2 mb-1">
+                      <Sparkles size={10} className="text-accent" />
+                      <span className="font-mono text-[8px] uppercase text-neutral-500 tracking-widest">AI Suggestions:</span>
+                    </div>
+                    {suggestions.map((s, idx) => (
+                      <button
+                        key={idx}
+                        type="button"
+                        onClick={() => {
+                          const newMessage = formData.message.endsWith(" ") ? formData.message + s : formData.message + " " + s;
+                          setFormData({ ...formData, message: newMessage });
+                          setSuggestions([]);
+                        }}
+                        className="bg-accent/5 hover:bg-accent/20 border border-accent/20 px-3 py-1.5 rounded-full font-sans text-[10px] text-accent/80 hover:text-accent transition-all text-left"
+                      >
+                        + {s}
+                      </button>
+                    ))}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
             
             {status === "error" && (
