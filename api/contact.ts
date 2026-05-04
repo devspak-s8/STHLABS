@@ -17,7 +17,7 @@ export default async function handler(req: any, res: any) {
     console.error("CRITICAL: RESEND_API_KEY is missing from environment.");
     return res.status(503).json({
       success: false,
-      error: "Service Unavailable: API configuration missing on host. Please check environment variables."
+      error: "Service Unavailable: The engineering hub is currently under maintenance. Please try again later."
     });
   }
 
@@ -53,7 +53,7 @@ export default async function handler(req: any, res: any) {
       console.error("Resend Admin Alert Error:", adminEmailResponse.error);
       return res.status(503).json({
         success: false,
-        error: `Resend Protocol Error: ${adminEmailResponse.error.message}. Ensure your ADMIN_EMAIL is verified in Resend.`
+        error: "Service Unavailable: Transmission failure. Our team has been notified."
       });
     }
 
@@ -122,7 +122,7 @@ export default async function handler(req: any, res: any) {
     console.error("Unexpected Hub Error:", error);
     return res.status(503).json({
       success: false,
-      error: "Service Unavailable: Transmission protocol failure. Check Resend dashboard for logs."
+      error: "Transmission Error: We were unable to process your request at this time. Please try again."
     });
   }
 }
