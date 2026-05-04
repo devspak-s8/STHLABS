@@ -2,6 +2,7 @@ import { Hero } from "../components/Hero";
 import { Capabilities } from "../components/Capabilities";
 import { Process } from "../components/Process";
 import { SelectedWork } from "../components/SelectedWork";
+import { ProjectGallery } from "../components/ProjectGallery";
 import { Technologies } from "../components/Technologies";
 import { Pricing } from "../components/Pricing";
 import { Testimonials } from "../components/Testimonials";
@@ -53,6 +54,7 @@ export const HomePage = ({ selectedTier, setSelectedTier }: HomePageProps) => {
         </motion.div>
 
         <SelectedWork />
+        <ProjectGallery />
 
         <Technologies />
 

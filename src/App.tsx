@@ -10,6 +10,7 @@ import { BackToTop } from "./components/BackToTop";
 import { SplashScreen } from "./components/SplashScreen";
 import { HomePage } from "./pages/HomePage";
 import { PricingPage } from "./pages/PricingPage";
+import { CaseStudyPage } from "./components/CaseStudyPage";
 import { useState, useEffect } from "react";
 import { Analytics } from "@vercel/analytics/react";
 
@@ -37,6 +38,7 @@ function AppContent() {
       <Routes>
         <Route path="/" element={<HomePage selectedTier={selectedTier} setSelectedTier={setSelectedTier} />} />
         <Route path="/pricing" element={<PricingPage />} />
+        <Route path="/case-study/:id" element={<CaseStudyPage />} />
       </Routes>
       
       <Footer />
