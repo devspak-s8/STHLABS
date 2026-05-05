@@ -161,9 +161,9 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
                     <CheckCircle2 className="text-black w-10 h-10" />
                   </div>
                   <div>
-                    <h3 className="text-white font-sans text-2xl font-bold uppercase tracking-tight mb-4">Message Sent</h3>
+                    <h3 className="text-white font-sans text-2xl font-bold uppercase tracking-tight mb-4">Project Inquiry Received</h3>
                     <p className="text-neutral-400 font-sans text-sm leading-relaxed mb-8">
-                      We have received your project details. You will be contacted within 20 minutes, and a call will be scheduled very soon. Please check your email within the next 20 minutes for further instructions.
+                      Your project details have been securely transmitted. Our lead engineers will review your submission and contact you via email within 20 minutes to finalize your booking and schedule a kickoff call.
                     </p>
                     <button 
                       onClick={closeModals}
@@ -206,7 +206,7 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
           viewport={{ once: true }}
           className="font-sans text-3xl md:text-5xl font-medium text-white tracking-tight uppercase"
         >
-          Work With Us
+          Book Your Project
         </motion.h2>
         <span className="font-mono text-xs text-neutral-500 tracking-tighter">[ 04 ]</span>
       </div>
@@ -313,7 +313,7 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
                 status === "sending" ? "bg-accent/50 text-black cursor-not-allowed" : "bg-white text-black hover:bg-accent"
               }`}
             >
-              {status === "sending" ? "Sending..." : "Submit Project"}
+              {status === "sending" ? "Analysing Requirements..." : "Book Your Development Slot"}
             </motion.button>
           </form>
       </motion.div>

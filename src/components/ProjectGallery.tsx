@@ -199,7 +199,7 @@ export const ProjectGallery = () => {
             onClick={() => document.getElementById('start-project')?.scrollIntoView({ behavior: 'smooth' })}
             className="px-10 py-5 bg-white text-black font-mono text-[11px] uppercase tracking-[0.3em] font-black hover:bg-accent transition-all active:scale-95"
           >
-            Initiate Protocol
+            Reserve Your Project Slot
           </button>
         </motion.div>
       </div>

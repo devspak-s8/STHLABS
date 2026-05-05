@@ -189,7 +189,7 @@ export const CaseStudyPage = () => {
             to="/#start-project"
             className="inline-block px-12 py-6 bg-white text-black font-mono text-[11px] uppercase tracking-[0.4em] font-black hover:bg-accent transition-all active:scale-95"
           >
-            Initiate Contact
+            Book a Consultation
           </Link>
         </div>
       </section>

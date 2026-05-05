@@ -61,7 +61,7 @@ export const Hero = () => {
             onClick={() => document.getElementById('start-project')?.scrollIntoView({ behavior: 'smooth' })}
             className="w-full sm:w-auto bg-white text-black font-mono text-[10px] md:text-xs font-medium px-8 py-4 uppercase tracking-wider hover:bg-accent transition-colors duration-200"
           >
-            Start a Project
+            Book Your Project
           </button>
           <button 
             onClick={() => document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' })}

@@ -188,7 +188,7 @@ export const Pricing = ({ onSelectTier }: PricingProps) => {
                   tier.popular ? 'bg-accent text-black hover:bg-white' : 'bg-white text-black hover:bg-accent'
                 }`}
               >
-                Select Tier
+                Book This Tier
               </button>
             </div>
           </motion.div>

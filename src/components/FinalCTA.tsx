@@ -10,13 +10,13 @@ export const FinalCTA = () => {
         transition={{ duration: 0.6 }}
       >
         <h2 className="font-sans text-4xl md:text-6xl font-semibold text-white mb-12 tracking-tight">
-          Ready to start your next project?
+          Ready to launch your vision?
         </h2>
         <button 
           onClick={() => document.getElementById('start-project')?.scrollIntoView({ behavior: 'smooth' })}
           className="bg-white text-black font-mono text-xs font-medium px-10 py-5 uppercase tracking-widest hover:bg-accent transition-colors duration-200"
         >
-          Start a Project
+          Book Your Project
         </button>
       </motion.div>
     </section>

@@ -140,7 +140,7 @@ export const PricingPage = () => {
                   onClick={() => navigate(`/?tier=${encodeURIComponent(tier.name)}#start-project`)}
                   className="w-full bg-white text-black py-4 font-mono text-xs font-bold uppercase tracking-widest hover:bg-accent transition-colors"
                 >
-                  Start Project
+                  Book This Project
                 </button>
               </div>
 
@@ -174,7 +174,7 @@ export const PricingPage = () => {
                 onClick={() => navigate("/?tier=Custom#start-project")}
                 className="px-8 py-4 border border-white text-white font-mono text-xs uppercase tracking-widest hover:bg-white hover:text-black transition-colors"
               >
-                Request Custom Protocol
+                Book Custom Protocol
               </button>
             </div>
           </div>
