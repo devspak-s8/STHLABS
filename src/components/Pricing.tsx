@@ -26,7 +26,7 @@ const rates = {
 const tiers = [
   {
     name: "Strategic Launchpad",
-    price: 500,
+    price: 1200,
     description: "Perfect for planning your project's foundation and long-term scaling strategy.",
     features: ["Strategic Design Planning", "Technology Selection", "Security Review", "Growth Roadmap"],
     details: [
@@ -39,7 +39,7 @@ const tiers = [
   },
   {
     name: "Product Accelerator",
-    price: 1500,
+    price: 3500,
     description: "A complete, high-performance product built and ready for your first users.",
     features: ["Custom App Development", "Reliable Backend", "Automated Updates", "Advanced Security"],
     popular: true,
@@ -54,7 +54,7 @@ const tiers = [
   },
   {
     name: "Growth Engine",
-    price: 5000,
+    price: 8500,
     description: "Enterprise-grade software designed for complex teams and high-traffic needs.",
     features: ["Custom Integrations", "Performance Optimization", "Workflow Automation", "Priority Support"],
     details: [

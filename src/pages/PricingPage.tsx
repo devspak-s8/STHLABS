@@ -6,7 +6,7 @@ import { ArrowLeft, Check, Zap, Cpu, Shield, Activity, Database, GitBranch } fro
 const tiers = [
   {
     name: "Strategic Launchpad",
-    price: 500,
+    price: 1200,
     icon: <Cpu className="w-8 h-8 text-accent" />,
     description: "A solid plan for your project's foundation and growth.",
     longDescription: "Our Launchpad service is for founders who want to get things right from day one. We analyze your requirements to ensure your product is built for scale, security, and long-term success.",
@@ -31,7 +31,7 @@ const tiers = [
   },
   {
     name: "Product Accelerator",
-    price: 1500,
+    price: 3500,
     icon: <Zap className="w-8 h-8 text-accent" />,
     popular: true,
     description: "A complete, high-performance product built to grow.",
@@ -57,7 +57,7 @@ const tiers = [
   },
   {
     name: "Growth Engine",
-    price: 5000,
+    price: 8500,
     icon: <Shield className="w-8 h-8 text-accent" />,
     description: "Enterprise software for complex business needs and high traffic.",
     longDescription: "For growing teams and established companies. We build custom internal tools, complex integrations, and large-scale systems that turn fragmented processes into high-performance engines.",
