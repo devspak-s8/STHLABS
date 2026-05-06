@@ -7,7 +7,7 @@ export const ProtocolStatusPage = () => {
 
   useEffect(() => {
     const fetchStatus = async () => {
-      const endpoints = ['/protocol-status', '/api/status'];
+      const endpoints = ['/api/protocol-status', '/api/status'];
       let lastError = null;
 
       for (const url of endpoints) {
@@ -16,11 +16,6 @@ export const ProtocolStatusPage = () => {
             headers: { 'Accept': 'application/json' }
           });
           
-          const contentType = response.headers.get('content-type');
-          if (contentType && contentType.includes('text/html')) {
-            throw new Error(`Endpoint ${url} returned HTML instead of JSON. Server routing issue.`);
-          }
-
           if (!response.ok) throw new Error(`HTTP ${response.status} at ${url}`);
           
           const data = await response.json();
@@ -32,8 +27,7 @@ export const ProtocolStatusPage = () => {
           lastError = err.message;
         }
       }
-      setError(lastError);
-      setLoading(false);
+      setError(lastError || 'System offline');
     };
 
     fetchStatus().finally(() => setLoading(false));

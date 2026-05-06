@@ -37,18 +37,20 @@ async function startServer() {
 
   // Explicit Diagnostics & Protocol Status
   const handleStatus = (req: express.Request, res: express.Response) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
     res.json({ 
       active: true, 
       node: "QUETTRIX-ALPHA-6", 
-      env: process.env.NODE_ENV || "not-set",
+      env: process.env.NODE_ENV || "production",
       resend_configured: !!process.env.RESEND_API_KEY,
       timestamp: new Date().toISOString(),
+      protocol: "SECURE-ALPHA",
       headers: req.headers['x-forwarded-proto'] ? 'proxied' : 'direct'
     });
   };
 
-  app.get("/protocol-status", handleStatus);
-  app.get("/protocol-status/", handleStatus);
+  // API Endpoints (Must be before static fallback)
+  app.get("/api/protocol-status", handleStatus);
   app.get("/api/status", handleStatus);
   app.get("/protocol-ping", (req, res) => res.send("PONG-ALPHA"));
 
