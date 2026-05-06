@@ -35,6 +35,23 @@ async function startServer() {
     next();
   });
 
+  // Explicit Diagnostics & Protocol Status
+  const handleStatus = (req: express.Request, res: express.Response) => {
+    res.json({ 
+      active: true, 
+      node: "QUETTRIX-ALPHA-6", 
+      env: process.env.NODE_ENV || "not-set",
+      resend_configured: !!process.env.RESEND_API_KEY,
+      timestamp: new Date().toISOString(),
+      headers: req.headers['x-forwarded-proto'] ? 'proxied' : 'direct'
+    });
+  };
+
+  app.get("/protocol-status", handleStatus);
+  app.get("/protocol-status/", handleStatus);
+  app.get("/api/status", handleStatus);
+  app.get("/protocol-ping", (req, res) => res.send("PONG-ALPHA"));
+
   // The Master Booking Protocol
   const handleBooking = async (req: express.Request, res: express.Response) => {
     console.log(`[PROTOCOL_ENGAGED] ${req.method} ${req.url} | Source: ${req.ip}`);
@@ -81,19 +98,6 @@ async function startServer() {
       res.status(500).json({ error: "Subsystem transmission error.", details: err.message });
     }
   };
-
-  // Explicit Health & Diagnostics
-  app.get("/protocol-status", (req, res) => {
-    res.json({ 
-      active: true, 
-      node: "QUETTRIX-ALPHA-6", 
-      env: process.env.NODE_ENV || "not-set",
-      resend_configured: !!process.env.RESEND_API_KEY,
-      timestamp: new Date().toISOString()
-    });
-  });
-
-  app.get("/protocol-ping", (req, res) => res.send("PONG-ALPHA"));
 
   app.post("/api/protocol/book", handleBooking);
   app.post("/api/protocol/book/", handleBooking); // Trailing slash support
@@ -146,19 +150,14 @@ async function startServer() {
     });
   }
 
-  if (!process.env.VERCEL) {
-    app.listen(PORT, "0.0.0.0", () => {
-      console.log(`[SYSTEM] Protocol initialized at http://localhost:${PORT}`);
-    });
-  }
+  app.listen(PORT, "0.0.0.0", () => {
+    console.log(`[SYSTEM] Protocol initialized at http://localhost:${PORT}`);
+  });
 
   return app;
 }
 
-const appPromise = startServer();
-
-export default async (req: any, res: any) => {
-  const app = await appPromise;
-  app(req, res);
-};
+startServer().catch(err => {
+  console.error("[FATAL] Server failed to start:", err);
+});
 
