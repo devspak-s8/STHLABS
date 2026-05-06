@@ -119,8 +119,14 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || "Uplink failure during transmission.");
+        let errorMsg = "Uplink failure during transmission.";
+        try {
+          const errorData = await response.json();
+          errorMsg = errorData.error || errorData.message || `Server Error: ${response.status}`;
+        } catch (e) {
+          errorMsg = `Network Error: ${response.status} ${response.statusText}`;
+        }
+        throw new Error(errorMsg);
       }
       
       localStorage.setItem('last_project_submission', Date.now().toString());

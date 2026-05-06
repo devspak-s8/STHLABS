@@ -16,6 +16,11 @@ async function startServer() {
 
   app.use(express.json());
 
+  // Health check
+  app.get("/api/health", (req, res) => {
+    res.json({ status: "alive", timestamp: new Date().toISOString() });
+  });
+
   // API Routes
   app.post("/api/book", async (req, res) => {
     const { name, email, message, tier, bookingDetails } = req.body;
@@ -24,8 +29,11 @@ async function startServer() {
     const senderEmail = process.env.SENDER_EMAIL || 'hello@quettrix.com';
 
     if (!apiKey) {
-      console.error("RESEND_API_KEY missing");
-      return res.status(503).json({ error: "Email service not configured." });
+      console.error("RESEND_API_KEY is null or undefined");
+      return res.status(503).json({ 
+        success: false,
+        error: "RESEND_API_KEY missing. Please configure it in the application settings." 
+      });
     }
 
     const resend = new Resend(apiKey);
