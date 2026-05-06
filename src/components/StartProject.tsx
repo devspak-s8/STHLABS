@@ -108,7 +108,8 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
     setStatus("loading");
 
     try {
-      const response = await fetch("/execute/booking", {
+      console.log("[DEBUG] Initializing uplink to /api/protocol/book");
+      const response = await fetch("/api/protocol/book", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -118,12 +119,16 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
         }),
       });
 
+      console.log(`[DEBUG] Uplink response: ${response.status} ${response.statusText}`);
+
       if (!response.ok) {
         let errorMsg = "Uplink failure during transmission.";
         try {
           const errorData = await response.json();
+          console.error("[DEBUG] Error data received:", errorData);
           errorMsg = errorData.error || errorData.message || `Server Error: ${response.status}`;
         } catch (e) {
+          console.error("[DEBUG] Failed to parse error JSON:", e);
           errorMsg = `Network Error: ${response.status} ${response.statusText}`;
         }
         throw new Error(errorMsg);
