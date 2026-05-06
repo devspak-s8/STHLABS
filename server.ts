@@ -13,7 +13,7 @@ const __dirname = path.dirname(__filename);
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = Number(process.env.PORT) || 3000;
 
   app.use((req, res, next) => {
     res.setHeader('X-Protocol-Node', 'QUETTRIX-ALPHA-6');
@@ -33,22 +33,6 @@ async function startServer() {
       console.log(`[POST_DEBUG] ${req.url} | Headers: ${JSON.stringify(req.headers)}`);
     }
     next();
-  });
-
-  app.get("/protocol-ping", (req, res) => res.send("PONG-ALPHA"));
-
-  // Technical Connectivity Check
-  app.get("/api/ping", (req, res) => {
-    res.json({ status: "online", protocol: "QUETTRIX-ALPHA", time: new Date().toISOString() });
-  });
-
-  app.get("/protocol-status", (req, res) => {
-    res.json({ 
-      active: true, 
-      node: "QUETTRIX-ALPHA-6", 
-      env: process.env.NODE_ENV,
-      resend_configured: !!process.env.RESEND_API_KEY 
-    });
   });
 
   // The Master Booking Protocol
@@ -98,6 +82,19 @@ async function startServer() {
     }
   };
 
+  // Explicit Health & Diagnostics
+  app.get("/protocol-status", (req, res) => {
+    res.json({ 
+      active: true, 
+      node: "QUETTRIX-ALPHA-6", 
+      env: process.env.NODE_ENV || "not-set",
+      resend_configured: !!process.env.RESEND_API_KEY,
+      timestamp: new Date().toISOString()
+    });
+  });
+
+  app.get("/protocol-ping", (req, res) => res.send("PONG-ALPHA"));
+
   app.post("/api/protocol/book", handleBooking);
   app.post("/api/protocol/book/", handleBooking); // Trailing slash support
   app.post("/api/book", handleBooking); 
@@ -123,25 +120,45 @@ async function startServer() {
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     console.log("[SYSTEM] Initializing Vite middleware (Development Mode)");
-    const { createServer: createViteServer } = await import("vite");
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
+    try {
+      const { createServer: createViteServer } = await import("vite");
+      const vite = await createViteServer({
+        server: { middlewareMode: true },
+        appType: "spa",
+      });
+      app.use(vite.middlewares);
+    } catch (viteErr) {
+      console.error("[CRITICAL] Failed to initialize Vite middleware:", viteErr);
+    }
   } else {
     console.log("[SYSTEM] Serving static files from /dist (Production Mode)");
-    const distPath = path.join(process.cwd(), "dist");
+    const distPath = path.resolve(__dirname, "dist");
+    
+    // Check if dist exists
     app.use(express.static(distPath));
     app.get("*", (req, res) => {
-      res.sendFile(path.join(distPath, "index.html"));
+      res.sendFile(path.join(distPath, "index.html"), (err) => {
+        if (err) {
+          console.error("[ERROR] Failed to send index.html:", err);
+          res.status(500).send("Internal Server Error: Missing Build Artifacts");
+        }
+      });
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`[SYSTEM] Protocol initialized at http://localhost:${PORT}`);
-  });
+  if (!process.env.VERCEL) {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`[SYSTEM] Protocol initialized at http://localhost:${PORT}`);
+    });
+  }
+
+  return app;
 }
 
-startServer();
+const appPromise = startServer();
+
+export default async (req: any, res: any) => {
+  const app = await appPromise;
+  app(req, res);
+};
 
