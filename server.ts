@@ -30,8 +30,9 @@ async function startServer() {
     res.json({ status: "alive", timestamp: new Date().toISOString() });
   });
 
-  // API Routes
-  app.post("/api/book", async (req, res) => {
+  // Primary Action Endpoint
+  app.post("/execute/booking", async (req, res) => {
+    console.log("[SERVER] Received booking request at /execute/booking");
     const { name, email, message, tier, bookingDetails } = req.body;
     const apiKey = process.env.RESEND_API_KEY;
     const adminEmail = process.env.ADMIN_EMAIL || 'provenly.main@gmail.com';
@@ -99,12 +100,19 @@ async function startServer() {
     }
   });
 
-  // Backward compatibility alias
-  app.post("/api/contact", async (req, res) => {
-    console.log("Redirecting /api/contact to /api/book logic");
-    // Reuse the same logic or just respond success if it's a test
-    res.json({ success: true, message: "Use /api/book for full processing" });
+  // Backward compatibility aliases
+  app.all("/api/*", async (req, res) => {
+    console.log(`[SERVER] Intercepted legacy /api request: ${req.method} ${req.url}`);
+    if (req.method === 'POST') {
+      // Redirect or handle? Better to handle for now to fix the 405
+      res.status(410).json({ error: "Endpoint deprecated. Use /execute/booking" });
+    } else {
+      res.json({ message: "Legacy API root" });
+    }
   });
+
+  app.post("/api/book", (req, res) => res.status(308).json({ redirect: "/execute/booking" }));
+  app.post("/api/contact", (req, res) => res.status(308).json({ redirect: "/execute/booking" }));
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {

@@ -108,7 +108,7 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
     setStatus("loading");
 
     try {
-      const response = await fetch("/api/book", {
+      const response = await fetch("/execute/booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
