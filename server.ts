@@ -3,6 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { createServer as createViteServer } from "vite";
 import cors from "cors";
+import morgan from "morgan";
 import { Resend } from "resend";
 import * as dotenv from "dotenv";
 
@@ -16,33 +17,23 @@ async function startServer() {
   const PORT = 3000;
 
   app.use(cors());
+  app.use(morgan('combined'));
   app.use(express.json());
 
-  // Log all requests with more detail
-  app.use((req, res, next) => {
-    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
-    console.log('Headers:', JSON.stringify(req.headers));
-    next();
-  });
-
-  // Health check
-  app.get("/api/health", (req, res) => {
-    res.json({ status: "alive", timestamp: new Date().toISOString() });
-  });
-
-  // Primary Action Endpoint
-  app.post("/execute/booking", async (req, res) => {
-    console.log("[SERVER] Received booking request at /execute/booking");
+  // Unified Booking Handler
+  const handleBooking = async (req: express.Request, res: express.Response) => {
+    console.log(`[BOOKING_PROTOCOL] Process started for ${req.body.email || "unknown contact"}`);
+    
     const { name, email, message, tier, bookingDetails } = req.body;
     const apiKey = process.env.RESEND_API_KEY;
     const adminEmail = process.env.ADMIN_EMAIL || 'provenly.main@gmail.com';
     const senderEmail = process.env.SENDER_EMAIL || 'hello@quettrix.com';
 
     if (!apiKey) {
-      console.error("RESEND_API_KEY is null or undefined");
+      console.error("[CRITICAL] RESEND_API_KEY missing from environment");
       return res.status(503).json({ 
         success: false,
-        error: "RESEND_API_KEY missing. Please configure it in the application settings." 
+        error: "RESEND_API_KEY missing. Contact administrator to configure the security portal." 
       });
     }
 
@@ -59,12 +50,16 @@ async function startServer() {
         to: [adminEmail],
         subject: `[NEW BOOKING] ${name} - ${tier || "Custom"}`,
         html: `
-          <div style="font-family: sans-serif; padding: 20px;">
-            <h2>New Project & Meeting Request</h2>
-            <p><strong>Client:</strong> ${name} (${email})</p>
-            <p><strong>Tier:</strong> ${tier || "Custom"}</p>
-            <p><strong>Schedule:</strong> ${dateStr} at ${timeStr} (${tzStr})</p>
-            <p><strong>Brief:</strong> ${message}</p>
+          <div style="font-family: sans-serif; padding: 20px; background: #fafafa; border: 1px solid #eee;">
+            <h2 style="color: #000; border-bottom: 2px solid #000; padding-bottom: 10px;">New Project Intake</h2>
+            <p><strong>Client Identity:</strong> ${name} (${email})</p>
+            <p><strong>Tier Protocol:</strong> ${tier || "Custom"}</p>
+            <p><strong>Scheduled Window:</strong> ${dateStr} at ${timeStr} (${tzStr})</p>
+            <hr style="border: 0; border-top: 1px solid #ddd; margin: 20px 0;"/>
+            <p><strong>Technical Brief:</strong></p>
+            <div style="background: #fff; padding: 15px; border-left: 4px solid #000;">
+              ${message}
+            </div>
           </div>
         `
       });
@@ -73,46 +68,64 @@ async function startServer() {
       await resend.emails.send({
         from: `QUETTRIX LABS <${senderEmail}>`,
         to: [email],
-        subject: "Project Inquiry & Kickoff Confirmed - QUETTRIX",
+        subject: "Protocol Initialized: Project Kickoff Confirmed",
         html: `
-          <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
-            <h1 style="color: #000;">QUETTRIX LABS</h1>
-            <p>Hello ${name},</p>
-            <p>We have successfully received your project brief and locked in your kickoff call.</p>
+          <div style="font-family: sans-serif; padding: 40px; color: #333; line-height: 1.6;">
+            <div style="text-align: center; margin-bottom: 40px;">
+              <h1 style="font-size: 24px; letter-spacing: 4px; color: #000; margin: 0;">QUETTRIX LABS</h1>
+              <p style="font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: #888;">Engineering & Tactical Design</p>
+            </div>
             
-            <div style="background: #f4f4f4; padding: 15px; margin: 20px 0;">
-              <p style="margin: 0;"><strong>Scheduled Kickoff:</strong> ${dateStr}</p>
-              <p style="margin: 5px 0 0 0;"><strong>Window:</strong> ${timeStr} (${tzStr})</p>
+            <p>Hello ${name},</p>
+            <p>Your technical brief has been received and verified. Our engineers are currently reviewing the schematic.</p>
+            
+            <div style="background: #f9f9f9; padding: 30px; margin: 30px 0; border: 1px solid #eee;">
+              <p style="margin: 0; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #999;">Confirmed Schedule</p>
+              <p style="margin: 10px 0; font-size: 18px; font-weight: bold;">${dateStr}</p>
+              <p style="margin: 0; font-size: 14px;">Window: ${timeStr} (${tzStr})</p>
             </div>
 
-            <p>Our lead engineers are reviewing your requirements. A calendar invite with a meeting link will be dispatched shortly.</p>
+            <p>A calendar reservation with the secure meeting uplink will be dispatched shortly.</p>
             <p>Welcome to the protocol.</p>
-            <br/>
-            <p><strong>The QUETTRIX Team</strong></p>
+            
+            <div style="margin-top: 60px; padding-top: 20px; border-top: 1px solid #eee; font-size: 12px; color: #999;">
+              <p>© 2026 QUETTRIX LABS. Protocol Alpha-6.</p>
+            </div>
           </div>
         `
       });
 
-      res.json({ success: true });
-    } catch (error) {
-      console.error("Booking Error:", error);
-      res.status(500).json({ error: "Failed to process booking." });
+      console.log(`[SUCCESS] Booking for ${email} transmitted successfully`);
+      res.json({ success: true, timestamp: new Date().toISOString() });
+    } catch (error: any) {
+      console.error("[ERROR] Email Dispatch Failure:", error);
+      res.status(500).json({ 
+        success: false, 
+        error: "Email transmission subsystem failure.",
+        details: error.message 
+      });
     }
+  };
+
+  // API Routes (Matched BEFORE Vite)
+  app.get("/api/health", (req, res) => res.json({ status: "alive", env: process.env.NODE_ENV }));
+  
+  // All possible booking paths point to the same robust handler
+  app.post("/execute/booking", handleBooking);
+  app.post("/api/book", handleBooking);
+  app.post("/api/contact", handleBooking);
+
+  // Catch-all for other /api requests to prevent 404s
+  app.all("/api/*", (req, res) => {
+    console.warn(`[WARN] Unhandled API request: ${req.method} ${req.url}`);
+    res.status(404).json({ error: "Tactical endpoint not found." });
   });
 
-  // Backward compatibility aliases
-  app.all("/api/*", async (req, res) => {
-    console.log(`[SERVER] Intercepted legacy /api request: ${req.method} ${req.url}`);
-    if (req.method === 'POST') {
-      // Redirect or handle? Better to handle for now to fix the 405
-      res.status(410).json({ error: "Endpoint deprecated. Use /execute/booking" });
-    } else {
-      res.json({ message: "Legacy API root" });
-    }
+  // Global error handler for JSON parsing etc.
+  app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+    console.error('[SERVER ERROR]', err);
+    res.status(500).json({ error: "Internal Server Protocol Exception" });
   });
-
-  app.post("/api/book", (req, res) => res.status(308).json({ redirect: "/execute/booking" }));
-  app.post("/api/contact", (req, res) => res.status(308).json({ redirect: "/execute/booking" }));
 
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
@@ -130,8 +143,9 @@ async function startServer() {
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`[SYSTEM] Protocol initialized at http://localhost:${PORT}`);
   });
 }
 
 startServer();
+
