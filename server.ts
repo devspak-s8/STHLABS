@@ -17,13 +17,17 @@ async function startServer() {
 
   app.use((req, res, next) => {
     res.setHeader('X-Protocol-Node', 'QUETTRIX-ALPHA-6');
-    res.setHeader('X-Protocol-Version', '1.0.5');
+    res.setHeader('X-Protocol-Version', '1.1.0');
     console.log(`[INCOMING] ${new Date().toISOString()} | ${req.method} ${req.url}`);
     next();
   });
 
   app.use(cors());
   app.use(morgan('dev'));
+  
+  // CORS Preflight Guard
+  app.options("*", cors());
+
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
@@ -57,13 +61,21 @@ async function startServer() {
   app.get("/api/status", handleStatus);
   app.get("/protocol-status-api", handleStatus); // Alias
   
+  // Use process.cwd() for better Vercel/CloudRun compatibility
+  const rootDir = process.cwd();
+  
   // Explicit route for the frontend page to avoid 404 issues on some platforms
   app.get("/protocol-status", (req, res) => {
     if (req.headers.accept?.includes('application/json')) {
       return handleStatus(req, res);
     }
-    const distPath = path.resolve(__dirname, "dist");
-    res.sendFile(path.join(distPath, "index.html"));
+    const distPath = path.join(rootDir, "dist");
+    res.sendFile(path.join(distPath, "index.html"), (err) => {
+      if (err) {
+        console.error("[FALLBACK] Dist index.html failed at path:", path.join(distPath, "index.html"));
+        res.status(404).send("Protocol UI unreachable. Build artifacts missing.");
+      }
+    });
   });
 
   app.get("/protocol-ping", (req, res) => res.send("PONG-ALPHA"));
@@ -151,8 +163,9 @@ async function startServer() {
       console.error("[CRITICAL] Failed to initialize Vite middleware:", viteErr);
     }
   } else {
-    console.log("[SYSTEM] Serving static files from /dist (Production Mode)");
-    const distPath = path.resolve(__dirname, "dist");
+    const rootDir = process.cwd();
+    console.log(`[SYSTEM] Serving static files from ${rootDir}/dist (Production Mode)`);
+    const distPath = path.join(rootDir, "dist");
     
     // Check if dist exists
     app.use(express.static(distPath));

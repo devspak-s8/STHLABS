@@ -3,13 +3,28 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "framework": "vite",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "functions": {
+    "server.ts": {
+      "maxDuration": 20
+    }
+  },
   "rewrites": [
     {
-      "source": "/api/(.*)",
+      "source": "/api/protocol/book",
+      "destination": "/server.ts"
+    },
+    {
+      "source": "/api/status",
       "destination": "/server.ts"
     },
     {
       "source": "/protocol-status",
+      "destination": "/server.ts"
+    },
+    {
+      "source": "/api/(.*)",
       "destination": "/server.ts"
     },
     {
