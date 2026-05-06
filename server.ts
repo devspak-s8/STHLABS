@@ -38,15 +38,18 @@ async function startServer() {
   // Explicit Diagnostics & Protocol Status
   const handleStatus = (req: express.Request, res: express.Response) => {
     res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
-    res.json({ 
+    const responseData = { 
       active: true, 
       node: "QUETTRIX-ALPHA-6", 
       env: process.env.NODE_ENV || "production",
+      environment: process.env.NODE_ENV || "production", // Alias for compatibility
       resend_configured: !!process.env.RESEND_API_KEY,
+      emailConfigured: !!process.env.RESEND_API_KEY, // Alias for compatibility
       timestamp: new Date().toISOString(),
       protocol: "SECURE-ALPHA",
       headers: req.headers['x-forwarded-proto'] ? 'proxied' : 'direct'
-    });
+    };
+    res.json(responseData);
   };
 
   // API Endpoints

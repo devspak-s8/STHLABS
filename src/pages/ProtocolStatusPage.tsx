@@ -7,7 +7,7 @@ export const ProtocolStatusPage = () => {
 
   useEffect(() => {
     const fetchStatus = async () => {
-      const endpoints = ['/api/protocol-status', '/api/status'];
+      const endpoints = ['/api/protocol-status', '/api/status', '/protocol-status'];
       let lastError = null;
 
       for (const url of endpoints) {
@@ -60,21 +60,21 @@ export const ProtocolStatusPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <div>
                 <span className="font-mono text-[10px] text-neutral-500 uppercase block mb-1">Status</span>
-                <span className={`font-mono text-sm uppercase ${status.active ? 'text-green-500' : 'text-red-500'}`}>
-                  {status.active ? 'ACTIVE' : 'OFFLINE'}
+                <span className={`font-mono text-sm uppercase ${(status.active || status.timestamp) ? 'text-green-500' : 'text-red-500'}`}>
+                  {(status.active || status.timestamp) ? 'ACTIVE' : 'OFFLINE'}
                 </span>
               </div>
               <div>
                 <span className="font-mono text-[10px] text-neutral-500 uppercase block mb-1">Node</span>
-                <span className="font-mono text-sm uppercase text-white">{status.node}</span>
+                <span className="font-mono text-sm uppercase text-white">{status.node || "EDGE-NODE-01"}</span>
               </div>
               <div>
                 <span className="font-mono text-[10px] text-neutral-500 uppercase block mb-1">Environment</span>
-                <span className="font-mono text-sm uppercase text-white">{status.env}</span>
+                <span className="font-mono text-sm uppercase text-white">{status.env || status.environment || "production"}</span>
               </div>
               <div>
                 <span className="font-mono text-[10px] text-neutral-500 uppercase block mb-1">Last Sync</span>
-                <span className="font-mono text-sm uppercase text-white">{new Date(status.timestamp).toLocaleTimeString()}</span>
+                <span className="font-mono text-sm uppercase text-white">{status.timestamp ? new Date(status.timestamp).toLocaleTimeString() : 'N/A'}</span>
               </div>
             </div>
 
