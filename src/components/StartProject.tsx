@@ -108,7 +108,7 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
     setStatus("loading");
 
     try {
-      console.log("[DEBUG] Initializing uplink to /api/protocol/book");
+      console.log("[DEBUG] [v1.0.5] Initializing uplink to /api/protocol/book");
       const response = await fetch("/api/protocol/book", {
         method: "POST",
         headers: { "Content-Type": "application/json" },

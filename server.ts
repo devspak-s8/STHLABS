@@ -16,8 +16,9 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  // Global logger for every request
   app.use((req, res, next) => {
+    res.setHeader('X-Protocol-Node', 'QUETTRIX-ALPHA-6');
+    res.setHeader('X-Protocol-Version', '1.0.5');
     console.log(`[INCOMING] ${new Date().toISOString()} | ${req.method} ${req.url}`);
     next();
   });
@@ -25,15 +26,35 @@ async function startServer() {
   app.use(cors());
   app.use(morgan('dev'));
   app.use(express.json());
+  app.use(express.urlencoded({ extended: true }));
+
+  // Debug POST headers
+  app.use((req, res, next) => {
+    if (req.method === 'POST') {
+      console.log(`[POST_DEBUG] ${req.url} | Headers: ${JSON.stringify(req.headers)}`);
+    }
+    next();
+  });
+
+  app.get("/protocol-ping", (req, res) => res.send("PONG-ALPHA"));
 
   // Technical Connectivity Check
   app.get("/api/ping", (req, res) => {
     res.json({ status: "online", protocol: "QUETTRIX-ALPHA", time: new Date().toISOString() });
   });
 
+  app.get("/protocol-status", (req, res) => {
+    res.json({ 
+      active: true, 
+      node: "QUETTRIX-ALPHA-6", 
+      env: process.env.NODE_ENV,
+      resend_configured: !!process.env.RESEND_API_KEY 
+    });
+  });
+
   // The Master Booking Protocol
   const handleBooking = async (req: express.Request, res: express.Response) => {
-    console.log(`[PROTOCOL_ENGAGED] Start: ${req.body.email || "anonymous"}`);
+    console.log(`[PROTOCOL_ENGAGED] ${req.method} ${req.url} | Source: ${req.ip}`);
     
     try {
       const { name, email, message, tier, bookingDetails } = req.body;
@@ -79,13 +100,19 @@ async function startServer() {
   };
 
   app.post("/api/protocol/book", handleBooking);
-  app.post("/api/book", handleBooking); // Alias
-  app.post("/api/contact", handleBooking); // Legacy Alias
+  app.post("/api/protocol/book/", handleBooking); // Trailing slash support
+  app.post("/api/book", handleBooking); 
+  app.post("/api/contact", handleBooking); 
 
   // Fail-safe for unhandled API
   app.all("/api/*", (req, res) => {
-    console.warn(`[MISS] Unhandled API request: ${req.url}`);
-    res.status(404).json({ error: "Endpoint not mapped in protocol." });
+    console.warn(`[MISS] Unhandled API request: ${req.method} ${req.url}`);
+    res.status(404).json({ 
+      error: "Endpoint not mapped in protocol.",
+      method: req.method,
+      path: req.url,
+      timestamp: new Date().toISOString()
+    });
   });
 
   // Global error handler for JSON parsing etc.
