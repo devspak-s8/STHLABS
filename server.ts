@@ -49,9 +49,20 @@ async function startServer() {
     });
   };
 
-  // API Endpoints (Must be before static fallback)
+  // API Endpoints
   app.get("/api/protocol-status", handleStatus);
   app.get("/api/status", handleStatus);
+  app.get("/protocol-status-api", handleStatus); // Alias
+  
+  // Explicit route for the frontend page to avoid 404 issues on some platforms
+  app.get("/protocol-status", (req, res) => {
+    if (req.headers.accept?.includes('application/json')) {
+      return handleStatus(req, res);
+    }
+    const distPath = path.resolve(__dirname, "dist");
+    res.sendFile(path.join(distPath, "index.html"));
+  });
+
   app.get("/protocol-ping", (req, res) => res.send("PONG-ALPHA"));
 
   // The Master Booking Protocol
@@ -152,14 +163,19 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`[SYSTEM] Protocol initialized at http://localhost:${PORT}`);
-  });
+  if (!process.env.VERCEL) {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`[SYSTEM] Protocol initialized at http://localhost:${PORT}`);
+    });
+  }
 
   return app;
 }
 
-startServer().catch(err => {
-  console.error("[FATAL] Server failed to start:", err);
-});
+const appPromise = startServer();
+
+export default async (req: any, res: any) => {
+  const app = await appPromise;
+  return app(req, res);
+};
 
