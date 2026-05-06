@@ -108,17 +108,26 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
     setStatus("loading");
 
     try {
-      // Simulate API transmission
-      await new Promise(resolve => setTimeout(resolve, 2500));
-      
-      // In a real app, you'd POST to your backend here
-      // const response = await fetch("/api/book", { ... });
+      const response = await fetch("/api/book", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...formData,
+          tier: selectedTier,
+          bookingDetails: schedule
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Uplink failure during transmission.");
+      }
       
       localStorage.setItem('last_project_submission', Date.now().toString());
       setStep("success");
       setStatus("idle");
-    } catch (error) {
-      setErrorMessage("Data transmission intercepted. Network failure.");
+    } catch (error: any) {
+      setErrorMessage(error.message || "Data transmission intercepted. Network failure.");
       setStep("details");
       setStatus("error");
     }
