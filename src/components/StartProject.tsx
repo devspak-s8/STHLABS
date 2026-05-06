@@ -32,8 +32,8 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
     const lastSubmission = localStorage.getItem('last_project_submission');
     if (lastSubmission) {
       const timeSince = Date.now() - parseInt(lastSubmission);
-      if (timeSince < 3600000) { // 1 hour cool down
-        const minutesLeft = Math.ceil((3600000 - timeSince) / 60000);
+      if (timeSince < 600000) { // 10 minute cool down (Urgent Re-submission Window)
+        const minutesLeft = Math.ceil((600000 - timeSince) / 60000);
         return { limited: true, minutesLeft };
       }
     }
