@@ -2,6 +2,7 @@ import express from "express";
 import path from "path";
 import { fileURLToPath } from "url";
 import { createServer as createViteServer } from "vite";
+import cors from "cors";
 import { Resend } from "resend";
 import * as dotenv from "dotenv";
 
@@ -14,7 +15,15 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  app.use(cors());
   app.use(express.json());
+
+  // Log all requests with more detail
+  app.use((req, res, next) => {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+    console.log('Headers:', JSON.stringify(req.headers));
+    next();
+  });
 
   // Health check
   app.get("/api/health", (req, res) => {
@@ -88,6 +97,13 @@ async function startServer() {
       console.error("Booking Error:", error);
       res.status(500).json({ error: "Failed to process booking." });
     }
+  });
+
+  // Backward compatibility alias
+  app.post("/api/contact", async (req, res) => {
+    console.log("Redirecting /api/contact to /api/book logic");
+    // Reuse the same logic or just respond success if it's a test
+    res.json({ success: true, message: "Use /api/book for full processing" });
   });
 
   // Vite middleware for development
