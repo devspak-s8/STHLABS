@@ -30,7 +30,8 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
   // Rate Limiting Logic from Environment Variables
   const checkRateLimit = () => {
     const meta = import.meta as any;
-    const cooldownPeriod = parseInt(meta.env.VITE_PROJECT_SUBMISSION_COOLDOWN || "600000");
+    const env = meta.env || {};
+    const cooldownPeriod = parseInt(env.VITE_PROJECT_SUBMISSION_COOLDOWN || "600000");
     const lastSubmission = localStorage.getItem('last_project_submission');
     
     if (lastSubmission) {
