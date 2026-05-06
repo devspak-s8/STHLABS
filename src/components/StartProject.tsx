@@ -27,13 +27,16 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
   const [isGeneratingSuggestions, setIsGeneratingSuggestions] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Rate Limiting Logic
+  // Rate Limiting Logic from Environment Variables
   const checkRateLimit = () => {
+    const meta = import.meta as any;
+    const cooldownPeriod = parseInt(meta.env.VITE_PROJECT_SUBMISSION_COOLDOWN || "600000");
     const lastSubmission = localStorage.getItem('last_project_submission');
+    
     if (lastSubmission) {
       const timeSince = Date.now() - parseInt(lastSubmission);
-      if (timeSince < 600000) { // 10 minute cool down (Urgent Re-submission Window)
-        const minutesLeft = Math.ceil((600000 - timeSince) / 60000);
+      if (timeSince < cooldownPeriod) {
+        const minutesLeft = Math.ceil((cooldownPeriod - timeSince) / 60000);
         return { limited: true, minutesLeft };
       }
     }
@@ -310,7 +313,7 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
                     <span className="font-mono text-[11px] uppercase tracking-widest">Protocol Email Dispatched</span>
                   </div>
                   <p className="font-sans text-sm text-neutral-400 leading-relaxed">
-                    Check your inbox at <span className="text-white font-medium">{formData.email}</span>. We've sent a digital verification and the calendar invite for {bookingDetails?.time} on {bookingDetails?.date && format(bookingDetails.date, "EEEE, MMMM do")}.
+                    Check your inbox at <span className="text-white font-medium">{formData.email}</span>. We've sent a digital verification and the calendar invite for the {bookingDetails?.time} window on {bookingDetails?.date && format(bookingDetails.date, "EEEE, MMMM do")}.
                   </p>
                 </div>
                 <div className="space-y-4">

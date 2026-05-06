@@ -50,12 +50,16 @@ export const BookingSchedule = ({ onComplete, projectData }: BookingScheduleProp
     const end = setHours(date, endHour);
 
     while (current < end) {
-      const timeStr = format(current, "HH:mm");
+      const startTime = format(current, "HH:mm");
+      const nextTime = addMinutes(current, 30);
+      const endTime = format(nextTime, "HH:mm");
+      const interval = `${startTime} - ${endTime}`;
+      
       // Don't show past times if date is today
       if (isAfter(current, new Date())) {
-        slots.push(timeStr);
+        slots.push(interval);
       }
-      current = addMinutes(current, 30);
+      current = nextTime;
     }
     return slots;
   };
