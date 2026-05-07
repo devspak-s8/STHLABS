@@ -8,7 +8,7 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const { name, email, message, tier } = req.body;
+  const { name, email, message, tier, schedule } = req.body;
   const apiKey = process.env.RESEND_API_KEY;
   const adminEmail = process.env.ADMIN_EMAIL || 'provenly.main@gmail.com';
   const senderEmail = process.env.SENDER_EMAIL || 'hello@quettrix.com'; // Change this to your verified domain email
@@ -22,6 +22,7 @@ export default async function handler(req: any, res: any) {
   }
 
   const resend = new Resend(apiKey);
+  const scheduleText = schedule ? `${schedule.date} at ${schedule.time} (${schedule.timezone})` : "Not scheduled";
 
   try {
     // 1. Send ALERT to ADMIN
@@ -39,6 +40,7 @@ export default async function handler(req: any, res: any) {
             <p style="margin-top: 24px;"><strong>Identity:</strong> ${name}</p>
             <p><strong>Contact:</strong> ${email}</p>
             <p><strong>Protocol Tier:</strong> ${tier || "Custom Configuration"}</p>
+            <p><strong>Scheduled Kickoff:</strong> ${scheduleText}</p>
             <div style="background: #f9fafb; padding: 24px; margin-top: 32px; border-left: 4px solid #000;">
               <p style="margin: 0; font-weight: bold; text-transform: uppercase; font-size: 11px; color: #6b7280; letter-spacing: 1px; margin-bottom: 12px;">Requirements Brief</p>
               <p style="margin: 0; color: #374151;">${message}</p>
@@ -78,12 +80,13 @@ export default async function handler(req: any, res: any) {
               <div style="padding: 48px 40px;">
                 <h2 style="color: #000; text-transform: uppercase; letter-spacing: 2px; font-size: 20px; margin-bottom: 24px;">Hello ${name},</h2>
                 <p style="font-size: 16px; margin-bottom: 16px;">We've received your inquiry for the <strong>${tier || "Custom"}</strong> package.</p>
+                <p style="font-size: 14px; color: #4b5563; margin-bottom: 24px;">Scheduled Session: <strong>${scheduleText}</strong></p>
                 <div style="background: #f0fdf4; border: 1px solid #dcfce7; padding: 20px; border-radius: 8px; margin: 32px 0;">
                   <p style="margin: 0; color: #166534; font-weight: 500;">
                     Status: High Priority Response Activated.
                   </p>
                   <p style="margin: 8px 0 0 0; color: #166534; font-size: 14px;">
-                    One of our team members will reach out to you <strong>within the next 20 minutes</strong> to discuss your requirements and schedule a call.
+                    One of our team members will reach out to you <strong>within the next 20 minutes</strong> to discuss your requirements and confirm the meeting details.
                   </p>
                 </div>
                 <p style="margin-bottom: 32px; color: #4b5563;">Please keep an eye on your inbox for further instructions and meeting links.</p>

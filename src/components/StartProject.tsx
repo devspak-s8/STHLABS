@@ -85,16 +85,35 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
     setStatus("loading");
 
     try {
-      // Simulate API transmission
-      await new Promise(resolve => setTimeout(resolve, 2500));
-      
-      // In a real app, you'd POST to your backend here
-      // const response = await fetch("/api/book", { ... });
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          message: formData.message,
+          tier: selectedTier,
+          schedule: {
+            date: format(schedule.date, "yyyy-MM-dd"),
+            time: schedule.time,
+            timezone: schedule.timezone
+          }
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Transmission failed");
+      }
       
       setStep("success");
       setStatus("idle");
     } catch (error) {
-      setErrorMessage("Data transmission intercepted. Network failure.");
+      console.error("Booking Error:", error);
+      setErrorMessage(error instanceof Error ? error.message : "Data transmission intercepted. Network failure.");
       setStep("details");
       setStatus("error");
     }
