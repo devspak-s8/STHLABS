@@ -60,7 +60,7 @@ export const Navbar = () => {
       id="navbar" 
       className={`fixed top-0 left-0 right-0 z-50 px-6 md:px-16 py-4 md:py-6 flex justify-between items-center transition-all duration-300 ${
         isScrolled || isMobileMenuOpen 
-          ? "bg-background/95 backdrop-blur-md border-b border-border shadow-2xl" 
+          ? "bg-black border-b border-border shadow-2xl" 
           : "bg-transparent border-b border-transparent"
       }`}
     >
@@ -117,10 +117,10 @@ export const Navbar = () => {
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="fixed inset-0 top-[60px] md:top-[76px] bg-background border-t border-border z-[49] flex flex-col p-8 md:hidden"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed left-0 right-0 top-[60px] md:top-[76px] bg-black border-t border-border z-[49] flex flex-col p-8 md:hidden shadow-2xl pb-12"
           >
             <div className="flex flex-col gap-6">
               {links.map((link) => (
