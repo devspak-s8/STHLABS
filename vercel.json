@@ -1,35 +1,8 @@
 {
-  "version": 2,
-  "buildCommand": "npm run build",
-  "outputDirectory": "dist",
-  "framework": "vite",
-  "cleanUrls": true,
-  "trailingSlash": false,
-  "functions": {
-    "api/server.ts": {
-      "maxDuration": 20
-    }
-  },
   "rewrites": [
     {
-      "source": "/api/protocol/book",
-      "destination": "/api/server.ts"
-    },
-    {
-      "source": "/api/status",
-      "destination": "/api/server.ts"
-    },
-    {
-      "source": "/protocol-status",
-      "destination": "/api/server.ts"
-    },
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/server.ts"
-    },
-    {
-      "source": "/protocol-ping",
-      "destination": "/api/server.ts"
+      "source": "/api/:path*",
+      "destination": "/api/:path*"
     },
     {
       "source": "/(.*)",

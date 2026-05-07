@@ -27,23 +27,6 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
   const [isGeneratingSuggestions, setIsGeneratingSuggestions] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Rate Limiting Logic from Environment Variables
-  const checkRateLimit = () => {
-    const meta = import.meta as any;
-    const env = meta.env || {};
-    const cooldownPeriod = parseInt(env.VITE_PROJECT_SUBMISSION_COOLDOWN || "600000");
-    const lastSubmission = localStorage.getItem('last_project_submission');
-    
-    if (lastSubmission) {
-      const timeSince = Date.now() - parseInt(lastSubmission);
-      if (timeSince < cooldownPeriod) {
-        const minutesLeft = Math.ceil((cooldownPeriod - timeSince) / 60000);
-        return { limited: true, minutesLeft };
-      }
-    }
-    return { limited: false };
-  };
-
   useEffect(() => {
     if (formData.message.length > 20 && formData.message.length < 200) {
       if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -90,12 +73,6 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
       return;
     }
 
-    const { limited, minutesLeft } = checkRateLimit();
-    if (limited) {
-      setErrorMessage(`Uplink congested. Please wait ${minutesLeft} minutes before submitting another protocol request.`);
-      return;
-    }
-
     setErrorMessage(null);
     setStep("scheduling");
     // Scroll to section start for smooth flow
@@ -108,37 +85,16 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
     setStatus("loading");
 
     try {
-      console.log("[DEBUG] [v1.0.5] Initializing uplink to /api/protocol/book");
-      const response = await fetch("/api/protocol/book", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          tier: selectedTier,
-          bookingDetails: schedule
-        }),
-      });
-
-      console.log(`[DEBUG] Uplink response: ${response.status} ${response.statusText}`);
-
-      if (!response.ok) {
-        let errorMsg = "Uplink failure during transmission.";
-        try {
-          const errorData = await response.json();
-          console.error("[DEBUG] Error data received:", errorData);
-          errorMsg = errorData.error || errorData.message || `Server Error: ${response.status}`;
-        } catch (e) {
-          console.error("[DEBUG] Failed to parse error JSON:", e);
-          errorMsg = `Network Error: ${response.status} ${response.statusText}`;
-        }
-        throw new Error(errorMsg);
-      }
+      // Simulate API transmission
+      await new Promise(resolve => setTimeout(resolve, 2500));
       
-      localStorage.setItem('last_project_submission', Date.now().toString());
+      // In a real app, you'd POST to your backend here
+      // const response = await fetch("/api/book", { ... });
+      
       setStep("success");
       setStatus("idle");
-    } catch (error: any) {
-      setErrorMessage(error.message || "Data transmission intercepted. Network failure.");
+    } catch (error) {
+      setErrorMessage("Data transmission intercepted. Network failure.");
       setStep("details");
       setStatus("error");
     }
