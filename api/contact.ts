@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import * as dotenv from "dotenv";
+import { format, parseISO } from "date-fns";
 
 dotenv.config();
 
@@ -22,7 +23,10 @@ export default async function handler(req: any, res: any) {
   }
 
   const resend = new Resend(apiKey);
-  const scheduleText = schedule ? `${schedule.date} at ${schedule.time} (${schedule.timezone})` : "Not scheduled";
+  const dateObj = schedule?.date ? parseISO(schedule.date) : null;
+  const formattedDate = dateObj ? format(dateObj, "EEEE, MMMM do, yyyy") : "TBD";
+  const scheduleText = schedule ? `${formattedDate} at ${schedule.time} (${schedule.timezone})` : "Not scheduled";
+  const zoomLink = "https://zoom.us/j/quettrix-lab-session"; // Placeholder Zoom link
 
   try {
     // 1. Send ALERT to ADMIN
@@ -41,6 +45,7 @@ export default async function handler(req: any, res: any) {
             <p><strong>Contact:</strong> ${email}</p>
             <p><strong>Protocol Tier:</strong> ${tier || "Custom Configuration"}</p>
             <p><strong>Scheduled Kickoff:</strong> ${scheduleText}</p>
+            <p><strong>Virtual Hub:</strong> <a href="${zoomLink}" style="color: #000; font-weight: bold;">Join Zoom Meeting</a></p>
             <div style="background: #f9fafb; padding: 24px; margin-top: 32px; border-left: 4px solid #000;">
               <p style="margin: 0; font-weight: bold; text-transform: uppercase; font-size: 11px; color: #6b7280; letter-spacing: 1px; margin-bottom: 12px;">Requirements Brief</p>
               <p style="margin: 0; color: #374151;">${message}</p>
@@ -80,7 +85,8 @@ export default async function handler(req: any, res: any) {
               <div style="padding: 48px 40px;">
                 <h2 style="color: #000; text-transform: uppercase; letter-spacing: 2px; font-size: 20px; margin-bottom: 24px;">Hello ${name},</h2>
                 <p style="font-size: 16px; margin-bottom: 16px;">We've received your inquiry for the <strong>${tier || "Custom"}</strong> package.</p>
-                <p style="font-size: 14px; color: #4b5563; margin-bottom: 24px;">Scheduled Session: <strong>${scheduleText}</strong></p>
+                <p style="font-size: 14px; color: #4b5563; margin-bottom: 8px;">Scheduled Session: <strong>${scheduleText}</strong></p>
+                <p style="font-size: 14px; color: #4b5563; margin-bottom: 24px;">Protocol Link: <a href="${zoomLink}" style="color: #2563eb; font-weight: 600; text-decoration: none;">Launch Zoom Hub</a></p>
                 <div style="background: #f0fdf4; border: 1px solid #dcfce7; padding: 20px; border-radius: 8px; margin: 32px 0;">
                   <p style="margin: 0; color: #166534; font-weight: 500;">
                     Status: High Priority Response Activated.
