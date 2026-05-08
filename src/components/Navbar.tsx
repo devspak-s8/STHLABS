@@ -6,7 +6,7 @@ import { Menu, X, Zap, ArrowUpRight } from "lucide-react";
 const links = [
   { name: "Services", href: "#services" },
   { name: "Portfolio", href: "#work" },
-  { name: "How we work", href: "#process" },
+  { name: "Site Watch", href: "/site-watch" },
   { name: "Pricing", href: "#pricing" },
   { name: "Common Questions", href: "#faq" },
   { name: "Tools", href: "#tech" },
@@ -29,6 +29,13 @@ export const Navbar = () => {
   }, []);
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (href.startsWith('/')) {
+      e.preventDefault();
+      navigate(href);
+      setIsMobileMenuOpen(false);
+      return;
+    }
+
     e.preventDefault();
     const id = href.replace('#', '');
     
