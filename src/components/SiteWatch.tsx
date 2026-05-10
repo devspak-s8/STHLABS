@@ -1,16 +1,20 @@
 import { motion, AnimatePresence } from "motion/react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { 
   Search, Activity, ShieldCheck, Globe, Zap, ArrowRight, Terminal, 
   BarChart3, Info, AlertTriangle, CheckCircle2, Settings as SettingsIcon, 
   Bell, TrendingUp, MousePointer2, History, PieChart as PieIcon, 
-  BarChart4, ChevronDown, ChevronUp, Share2, Server, Timer
+  BarChart4, ChevronDown, ChevronUp, Share2, Server, Timer, Download,
+  Ticket
 } from "lucide-react";
 import { GoogleGenAI } from "@google/genai";
 import { 
   ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, 
   BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, ScatterChart, Scatter, ZAxis
 } from "recharts";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
+import { NetworkGraph } from "./NetworkGraph";
 
 // Mock data generators
 const generateTimeSeries = (points: number) => 
@@ -19,7 +23,10 @@ const generateTimeSeries = (points: number) =>
     latency: Math.floor(Math.random() * 200) + 100,
     errors: Math.random() > 0.8 ? Math.floor(Math.random() * 5) : 0,
     traffic: Math.floor(Math.random() * 1000) + 500,
-    rank: 100 - (i * 2) + Math.floor(Math.random() * 5)
+    rank: 100 - (i * 2) + Math.floor(Math.random() * 5),
+    cpu: Math.floor(Math.random() * 30) + 10,
+    memory: Math.floor(Math.random() * 20) + 40,
+    bandwidth: Math.floor(Math.random() * 500) + 200
   }));
 
 const trafficSourceData = [
@@ -77,6 +84,8 @@ export const SiteWatch = () => {
   const [history, setHistory] = useState<AnalysisData[]>([]);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [liveData, setLiveData] = useState(generateTimeSeries(20));
+  const [anomalies, setAnomalies] = useState<{ id: string; type: string; timestamp: string; severity: "low" | "high" }[]>([]);
+  const [automations, setAutomations] = useState<{ id: string; action: string; status: "complete" | "running"; timestamp: string }[]>([]);
   
   const [thresholds, setThresholds] = useState<Thresholds>(() => {
     const saved = localStorage.getItem('quettrix_thresholds');
@@ -84,9 +93,51 @@ export const SiteWatch = () => {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [alerts, setAlerts] = useState<{ type: "warning" | "error"; message: string }[]>([]);
+  const [discountCode, setDiscountCode] = useState("");
+  const [discountApplied, setDiscountApplied] = useState(false);
+  const [discountError, setDiscountError] = useState(false);
+
+  const reportRef = useRef<HTMLDivElement>(null);
+
+  const handleDownloadReport = async () => {
+    if (!reportRef.current) return;
+    setIsDownloading(true);
+    try {
+      const canvas = await html2canvas(reportRef.current, {
+        backgroundColor: "#000000",
+        scale: 2,
+        logging: false,
+        useCORS: true
+      });
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: [canvas.width, canvas.height]
+      });
+      pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
+      pdf.save(`SiteWatch_Report_${data?.url || "Analysis"}.pdf`);
+    } catch (err) {
+      console.error("PDF Export failed", err);
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
+  const handleApplyDiscount = () => {
+    if (discountCode === "QUETTRIXLABS") {
+      setDiscountApplied(true);
+      setDiscountError(false);
+    } else {
+      setDiscountApplied(false);
+      setDiscountError(true);
+      setTimeout(() => setDiscountError(false), 3000);
+    }
+  };
 
   const handleSubmitReview = async () => {
     if (!data || !aiAudit) return;
@@ -112,10 +163,20 @@ export const SiteWatch = () => {
         }),
       });
 
-      if (response.ok) {
-        setSubmitSuccess(true);
-        setTimeout(() => setSubmitSuccess(false), 5000);
+      if (!response.ok) {
+        const errorText = await response.text();
+        let errorMessage = "Transmission failed";
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          errorMessage = `Protocol Error: ${response.status} ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
       }
+
+      setSubmitSuccess(true);
+      setTimeout(() => setSubmitSuccess(false), 5000);
     } catch (err) {
       console.error("Submission failed", err);
     } finally {
@@ -128,12 +189,60 @@ export const SiteWatch = () => {
     const interval = setInterval(() => {
       setLiveData(prev => {
         const last = prev[prev.length - 1];
+        const newLatency = Math.floor(Math.random() * 150) + 80;
+        const newTraffic = Math.floor(Math.random() * 200) + 800;
+        
+        // Trigger automated response if latency is high
+        if (newLatency > 200) {
+          const actionId = Math.random().toString(36).substr(2, 5).toUpperCase();
+          setAutomations(prev => [{
+            id: actionId,
+            action: "Scaling API Nodes (Horizontal Forge)",
+            status: "running",
+            timestamp: new Date().toLocaleTimeString()
+          }, ...prev].slice(0, 5));
+          
+          setAnomalies(prev => [{
+            id: Math.random().toString(36).substr(2, 5).toUpperCase(),
+            type: "LATENCY_SPIKE",
+            timestamp: new Date().toLocaleTimeString(),
+            severity: "high"
+          }, ...prev].slice(0, 5));
+
+          setTimeout(() => {
+            setAutomations(prev => prev.map(a => a.id === actionId ? {...a, status: "complete" as const} : a));
+          }, 2000);
+        }
+
+        // Random Traffic Anomaly
+        if (newTraffic > 950) {
+           setAnomalies(prev => [{
+            id: Math.random().toString(36).substr(2, 5).toUpperCase(),
+            type: "TRAFFIC_BURST",
+            timestamp: new Date().toLocaleTimeString(),
+            severity: "low"
+          }, ...prev].slice(0, 5));
+        }
+
+        // Random Anomaly detection
+        if (Math.random() > 0.98) {
+          setAnomalies(prev => [{
+            id: Math.random().toString(36).substr(2, 5).toUpperCase(),
+            type: "SPECTRAL_VARIANCE",
+            timestamp: new Date().toLocaleTimeString(),
+            severity: Math.random() > 0.5 ? "high" : "low"
+          }, ...prev].slice(0, 5));
+        }
+
         const next = [...prev.slice(1), {
           time: new Date().toLocaleTimeString([], { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-          latency: Math.floor(Math.random() * 150) + 80,
+          latency: newLatency,
           errors: Math.random() > 0.9 ? 1 : 0,
-          traffic: Math.floor(Math.random() * 200) + 800,
-          rank: last.rank + (Math.random() > 0.5 ? 1 : -1)
+          traffic: newTraffic,
+          rank: last.rank + (Math.random() > 0.5 ? 1 : -1),
+          cpu: Math.floor(Math.random() * 40) + 20,
+          memory: Math.floor(Math.random() * 30) + 50,
+          bandwidth: Math.floor(Math.random() * 800) + 400
         }];
         return next;
       });
@@ -305,11 +414,15 @@ export const SiteWatch = () => {
           )}
 
           {status === "success" && data && (
-            <motion.div key="success" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-12">
+            <motion.div key="success" ref={reportRef} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-12 bg-black">
               
               {/* Telemetry Visuals */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <VisualBox icon={<TrendingUp size={14}/>} label="Neural Flux (Traffic)">
+                <VisualBox 
+                  icon={<TrendingUp size={14}/>} 
+                  label="Neural Flux (Traffic)" 
+                  isAnomalous={liveData[liveData.length-1].traffic > 950}
+                >
                   <ResponsiveContainer width="100%" height={120}>
                     <AreaChart data={liveData}>
                       <Area type="stepBefore" dataKey="traffic" stroke="#FFF" fill="#111" strokeWidth={1} />
@@ -325,7 +438,11 @@ export const SiteWatch = () => {
                     </PieChart>
                   </ResponsiveContainer>
                 </VisualBox>
-                <VisualBox icon={<Timer size={14}/>} label="Ping Latency">
+                <VisualBox 
+                  icon={<Timer size={14}/>} 
+                  label="Ping Latency"
+                  isAnomalous={liveData[liveData.length-1].latency > 200}
+                >
                    <ResponsiveContainer width="100%" height={120}>
                     <LineChart data={liveData}>
                       <Line type="monotone" dataKey="latency" stroke="#FFF" dot={false} strokeWidth={2} />
@@ -333,13 +450,132 @@ export const SiteWatch = () => {
                     </LineChart>
                   </ResponsiveContainer>
                 </VisualBox>
-                <VisualBox icon={<Share2 size={14}/>} label="Index Rank">
+                <VisualBox 
+                  icon={<Share2 size={14}/>} 
+                  label="Index Rank"
+                  isAnomalous={anomalies.some(a => a.type === 'SPECTRAL_VARIANCE')}
+                >
                    <ResponsiveContainer width="100%" height={120}>
                     <BarChart data={liveData}>
                       <Bar dataKey="rank" fill="#333" />
                     </BarChart>
                   </ResponsiveContainer>
                 </VisualBox>
+              </div>
+
+              {/* Infrastructure & Automation Layer */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Live Infrastructure Monitoring */}
+                <div className="p-8 border border-white/10 bg-black/40 rounded-xl lg:col-span-1">
+                   <h3 className="font-mono text-xs uppercase tracking-widest text-neutral-500 mb-8 flex items-center gap-2">
+                     <Server size={14} className="text-accent" /> Live Infrastructure
+                   </h3>
+                   <div className="space-y-6">
+                      <div className="space-y-2">
+                         <div className="flex justify-between font-mono text-[9px] uppercase text-neutral-500">
+                            <span>CPU Matrix</span>
+                            <span className="text-white">{liveData[liveData.length-1].cpu}%</span>
+                         </div>
+                         <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                            <motion.div 
+                              initial={{ width: 0 }}
+                              animate={{ width: `${liveData[liveData.length-1].cpu}%` }}
+                              className="h-full bg-accent"
+                            />
+                         </div>
+                      </div>
+                      <div className="space-y-2">
+                         <div className="flex justify-between font-mono text-[9px] uppercase text-neutral-500">
+                            <span>Memory Load</span>
+                            <span className="text-white">{liveData[liveData.length-1].memory}%</span>
+                         </div>
+                         <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                            <motion.div 
+                              initial={{ width: 0 }}
+                              animate={{ width: `${liveData[liveData.length-1].memory}%` }}
+                              className="h-full bg-white"
+                            />
+                         </div>
+                      </div>
+                      <div className="space-y-2">
+                         <div className="flex justify-between font-mono text-[9px] uppercase text-neutral-500">
+                            <span>Spectral Bandwidth</span>
+                            <span className="text-white">{liveData[liveData.length-1].bandwidth} Mbps</span>
+                         </div>
+                         <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+                            <motion.div 
+                              initial={{ width: 0 }}
+                              animate={{ width: `${(liveData[liveData.length-1].bandwidth / 1500) * 100}%` }}
+                              className="h-full bg-neutral-600"
+                            />
+                         </div>
+                      </div>
+                      <div className="pt-4 border-t border-white/5 grid grid-cols-2 gap-4">
+                         <div>
+                            <div className="text-[8px] uppercase text-neutral-600 font-mono">Uptime Status</div>
+                            <div className="text-xs font-bold text-green-500">99.9997%</div>
+                         </div>
+                         <div>
+                            <div className="text-[8px] uppercase text-neutral-600 font-mono">API Health</div>
+                            <div className="text-xs font-bold text-accent">STABLE</div>
+                         </div>
+                      </div>
+                   </div>
+                </div>
+
+                {/* Operational Intelligence */}
+                <div className="p-8 border border-white/10 bg-black/40 rounded-xl lg:col-span-1">
+                   <h3 className="font-mono text-xs uppercase tracking-widest text-neutral-500 mb-8 flex items-center gap-2">
+                     <AlertTriangle size={14} className="text-accent" /> Operational Intelligence
+                   </h3>
+                   <div className="space-y-4 max-h-[180px] overflow-y-auto pr-2 custom-scrollbar">
+                      {anomalies.length > 0 ? anomalies.map(a => (
+                        <div key={a.id} className="p-3 border border-white/5 bg-white/[0.02] rounded flex items-center justify-between group">
+                           <div className="flex flex-col">
+                              <span className={`text-[8px] uppercase font-bold ${a.severity === 'high' ? 'text-red-500' : 'text-orange-500'}`}>
+                                 {a.severity === 'high' ? 'High Severity' : 'Deviation'}
+                              </span>
+                              <span className="text-[10px] font-mono text-neutral-400 group-hover:text-white transition-colors">{a.type}</span>
+                           </div>
+                           <span className="text-[8px] font-mono text-neutral-600">{a.timestamp}</span>
+                        </div>
+                      )) : (
+                        <div className="text-center py-12 text-[10px] font-mono text-neutral-600 uppercase tracking-widest opacity-30">
+                           Awaiting Deviations...
+                        </div>
+                      )}
+                   </div>
+                   <div className="mt-6 pt-4 border-t border-white/5 flex items-center gap-3">
+                      <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                      <span className="text-[9px] font-mono uppercase text-neutral-500 tracking-widest">Normal Activity Detected</span>
+                   </div>
+                </div>
+
+                {/* Automation Layer */}
+                <div className="p-8 border border-white/10 bg-black/40 rounded-xl lg:col-span-1">
+                   <h3 className="font-mono text-xs uppercase tracking-widest text-neutral-500 mb-8 flex items-center gap-2">
+                     <Zap size={14} className="text-accent" /> Neural Automation
+                   </h3>
+                   <div className="space-y-4">
+                      {automations.map(act => (
+                        <div key={act.id} className="flex gap-4 items-start">
+                           <div className={`mt-1.5 w-1.5 h-1.5 rounded-full ${act.status === 'running' ? 'bg-accent animate-ping' : 'bg-green-500'}`} />
+                           <div className="flex-1">
+                              <div className="flex justify-between items-center">
+                                 <span className="text-[10px] font-bold uppercase tracking-tighter">{act.action}</span>
+                                 <span className="text-[8px] font-mono text-neutral-500">{act.timestamp}</span>
+                              </div>
+                              <p className="text-[9px] font-mono text-neutral-600 uppercase mt-1">Status: {act.status === 'running' ? 'Active Protocol' : 'Protocol Resolved'}</p>
+                           </div>
+                        </div>
+                      ))}
+                      {automations.length === 0 && (
+                        <div className="text-center py-12 text-[10px] font-mono text-neutral-600 uppercase tracking-widest opacity-30">
+                           Automation Passive...
+                        </div>
+                      )}
+                   </div>
+                </div>
               </div>
 
               {/* Data Grid */}
@@ -429,7 +665,7 @@ export const SiteWatch = () => {
                            ))}
                         </div>
                         
-                        <div className="pt-6 border-t border-white/5">
+                        <div className="pt-6 border-t border-white/5 space-y-4">
                           <button 
                             onClick={handleSubmitReview}
                             disabled={isSubmitting || submitSuccess}
@@ -440,6 +676,15 @@ export const SiteWatch = () => {
                             }`}
                           >
                             {isSubmitting ? 'Transmitting...' : submitSuccess ? 'Report Submitted' : 'Submit for Review'}
+                          </button>
+
+                          <button 
+                            onClick={handleDownloadReport}
+                            disabled={isDownloading}
+                            className="w-full py-4 font-mono text-[10px] uppercase tracking-widest border border-white/10 hover:border-accent transition-all flex items-center justify-center gap-2"
+                          >
+                            <Download size={14} />
+                            {isDownloading ? 'Encoding PDF...' : 'Download Report'}
                           </button>
                         </div>
 
@@ -513,32 +758,58 @@ export const SiteWatch = () => {
                    <h3 className="font-mono text-xs uppercase tracking-widest text-neutral-500 mb-8 flex items-center gap-2">
                      <Share2 size={12} className="text-accent" /> Spectral Mesh Topology
                    </h3>
-                   <div className="relative h-32 flex items-center justify-center">
-                      <div className="absolute inset-0 flex items-center justify-center">
-                         <div className="w-16 h-16 border border-accent/20 rounded-full animate-ping" />
-                      </div>
-                      <div className="grid grid-cols-3 gap-12 relative z-10">
-                        {[1,2,3].map(i => (
-                          <motion.div 
-                            key={i}
-                            animate={{ y: [0, -5, 0] }}
-                            transition={{ duration: 2 + i, repeat: Infinity, ease: "easeInOut" }}
-                            className="w-8 h-8 border border-white/10 bg-black flex items-center justify-center rounded"
-                          >
-                            <Terminal size={10} className="text-neutral-500" />
-                          </motion.div>
-                        ))}
-                      </div>
-                      <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-10">
-                         <line x1="50%" y1="50%" x2="20%" y2="20%" stroke="white" strokeWidth="0.5" />
-                         <line x1="50%" y1="50%" x2="80%" y2="20%" stroke="white" strokeWidth="0.5" />
-                         <line x1="50%" y1="50%" x2="50%" y2="80%" stroke="white" strokeWidth="0.5" />
-                      </svg>
+                   <div className="relative h-[300px] flex items-center justify-center">
+                      <NetworkGraph links={data.metadata.linkSamples || []} mainUrl={data.url} />
+                   </div>
+                   <div className="mt-4 flex justify-between font-mono text-[8px] text-neutral-600 uppercase">
+                      <span>Root Uplink</span>
+                      <span>Discovered Nodes</span>
                    </div>
                 </div>
               </div>
 
             </motion.div>
+          )}
+
+          {status === "success" && (
+            <div className="pt-12 border-t border-white/10">
+              <div className="max-w-md mx-auto p-8 border border-white/10 bg-white/[0.02] rounded-xl text-center space-y-6">
+                <div className="flex justify-center">
+                  <Ticket size={24} className="text-accent" />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-sm font-bold uppercase tracking-widest">Protocol Voucher</h3>
+                  <p className="text-[10px] text-neutral-500 font-mono uppercase">Enter your project code for spectral discounts.</p>
+                </div>
+                <div className="flex gap-2">
+                  <input 
+                    type="text" 
+                    value={discountCode}
+                    onChange={e => setDiscountCode(e.target.value.toUpperCase())}
+                    placeholder="ENTER CODE"
+                    className={`flex-1 bg-black border ${discountError ? 'border-red-500' : 'border-white/10'} p-3 font-mono text-[10px] outline-none focus:border-accent transition-colors`}
+                  />
+                  <button 
+                    onClick={handleApplyDiscount}
+                    className="px-6 bg-white text-black font-mono text-[10px] uppercase hover:bg-accent transition-colors"
+                  >
+                    Apply
+                  </button>
+                </div>
+                <AnimatePresence>
+                  {discountApplied && (
+                    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="p-3 border border-green-500/20 bg-green-500/5 text-green-500 font-mono text-[9px] uppercase">
+                      30% Logic Discount Applied: QUETTRIXLABS
+                    </motion.div>
+                  )}
+                  {discountError && (
+                    <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="p-3 border border-red-500/20 bg-red-500/5 text-red-500 font-mono text-[9px] uppercase">
+                      Invalid Protocol Code
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
           )}
 
           {status === "idle" && (
@@ -586,12 +857,21 @@ export const SiteWatch = () => {
   );
 };
 
-const VisualBox = ({ icon, label, children }: { icon: any, label: string, children: any }) => (
-  <div className="p-6 border border-white/10 bg-black/40 rounded-xl">
-    <div className="flex items-center gap-2 mb-4 text-neutral-600 uppercase tracking-widest text-[9px] font-bold">
+const VisualBox = ({ icon, label, children, isAnomalous }: { icon: any, label: string, children: any, isAnomalous?: boolean }) => (
+  <div className={`p-6 border rounded-xl transition-all duration-500 ${
+    isAnomalous 
+      ? 'border-red-500/50 bg-red-950/10 shadow-[0_0_20px_rgba(239,68,68,0.1)]' 
+      : 'border-white/10 bg-black/40'
+  }`}>
+    <div className={`flex items-center gap-2 mb-4 uppercase tracking-widest text-[9px] font-bold transition-colors ${
+      isAnomalous ? 'text-red-500' : 'text-neutral-600'
+    }`}>
+      {isAnomalous && <AlertTriangle size={10} className="animate-pulse" />}
       {icon} {label}
     </div>
-    {children}
+    <div className={isAnomalous ? 'animate-pulse opacity-80' : ''}>
+      {children}
+    </div>
   </div>
 );
 

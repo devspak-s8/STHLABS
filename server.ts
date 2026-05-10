@@ -2,9 +2,9 @@ import express from "express";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
-import analyzeHandler from "./api/analyze.js";
-import contactHandler from "./api/contact.js";
-import statusHandler from "./api/status.js";
+import analyzeHandler from "./api/analyze.ts";
+import contactHandler from "./api/contact.ts";
+import statusHandler from "./api/status.ts";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

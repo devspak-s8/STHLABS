@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "motion/react";
 import React, { useState, useEffect, useRef } from "react";
-import { Loader2, CheckCircle2, X, Sparkles, Calendar, ArrowRight, ShieldCheck, Mail } from "lucide-react";
+import { Loader2, CheckCircle2, X, Sparkles, Calendar, ArrowRight, ShieldCheck, Mail, Ticket } from "lucide-react";
 import { GoogleGenAI } from "@google/genai";
 import { BookingSchedule } from "./BookingSchedule";
 import { format } from "date-fns";
@@ -11,10 +11,10 @@ interface StartProjectProps {
   selectedTier: string | null;
 }
 
-type BookingStep = 'details' | 'scheduling' | 'transmitting' | 'success';
+type BookingStep = 'brief' | 'scheduling' | 'details' | 'transmitting' | 'success';
 
 export const StartProject = ({ selectedTier }: StartProjectProps) => {
-  const [step, setStep] = useState<BookingStep>("details");
+  const [step, setStep] = useState<BookingStep>("brief");
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -25,7 +25,21 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
   const [bookingDetails, setBookingDetails] = useState<{ date: Date; time: string; timezone: string } | null>(null);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [isGeneratingSuggestions, setIsGeneratingSuggestions] = useState(false);
+  const [discountCode, setDiscountCode] = useState("");
+  const [discountApplied, setDiscountApplied] = useState(false);
+  const [discountError, setDiscountError] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleApplyDiscount = () => {
+    if (discountCode === "QUETTRIXLABS") {
+      setDiscountApplied(true);
+      setDiscountError(false);
+    } else {
+      setDiscountApplied(false);
+      setDiscountError(true);
+      setTimeout(() => setDiscountError(false), 3000);
+    }
+  };
 
   useEffect(() => {
     if (formData.message.length > 20 && formData.message.length < 200) {
@@ -79,8 +93,16 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
     document.getElementById('start-project')?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const handleScheduleComplete = async (schedule: { date: Date; time: string; timezone: string }) => {
+  const handleScheduleComplete = (schedule: { date: Date; time: string; timezone: string }) => {
     setBookingDetails(schedule);
+    setStep("details");
+    document.getElementById('start-project')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleFinalSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!bookingDetails) return;
+    
     setStep("transmitting");
     setStatus("loading");
 
@@ -96,18 +118,27 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
           message: formData.message,
           tier: selectedTier,
           schedule: {
-            date: format(schedule.date, "yyyy-MM-dd"),
-            time: schedule.time,
-            timezone: schedule.timezone
-          }
+            date: format(bookingDetails.date, "yyyy-MM-dd"),
+            time: bookingDetails.time,
+            timezone: bookingDetails.timezone
+          },
+          discountCode: discountApplied ? "QUETTRIXLABS" : null
         }),
       });
 
-      const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.error || "Transmission failed");
+        const errorText = await response.text();
+        let errorMessage = "Transmission failed";
+        try {
+          const errorData = JSON.parse(errorText);
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          errorMessage = `Protocol Error: ${response.status} ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
       }
+
+      const data = await response.json();
       
       setStep("success");
       setStatus("idle");
@@ -134,67 +165,31 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
             >
               <div className="w-8 h-px bg-accent" />
               <span className="font-mono text-[10px] uppercase tracking-[0.3em] text-accent">
-                {step === 'details' ? 'Step 01 // Integration' : step === 'scheduling' ? 'Step 02 // Scheduling' : 'Protocol Success'}
+                {step === 'brief' ? 'Step 01 // Integration' : step === 'scheduling' ? 'Step 02 // Scheduling' : step === 'details' ? 'Step 03 // Verification' : 'Protocol Success'}
               </span>
             </motion.div>
             <h2 className="font-sans text-4xl md:text-6xl font-medium text-white tracking-tight leading-[1.1]">
-              {step === 'details' && <>Initialize <span className="text-neutral-500">Project.</span></>}
+              {step === 'brief' && <>Initialize <span className="text-neutral-500">Project.</span></>}
               {step === 'scheduling' && <>Lock In <span className="text-neutral-500">Kickoff.</span></>}
+              {step === 'details' && <>Client <span className="text-neutral-500">Identity.</span></>}
               {step === 'success' && <>Booking <span className="text-neutral-500">Confirmed.</span></>}
             </h2>
           </div>
           <span className="font-mono text-xs text-neutral-500 tracking-tighter hidden md:block">
-            {step === 'details' ? '[ PHASE_01 ]' : step === 'scheduling' ? '[ PHASE_02 ]' : '[ COMPLETED ]'}
+            {step === 'brief' ? '[ PHASE_01 ]' : step === 'scheduling' ? '[ PHASE_02 ]' : step === 'details' ? '[ PHASE_03 ]' : '[ COMPLETED ]'}
           </span>
         </div>
 
         <AnimatePresence mode="wait">
-          {step === "details" && (
+          {step === "brief" && (
             <motion.div
-              key="details"
+              key="brief"
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
               className="max-w-2xl"
             >
               <form onSubmit={handleInitialSubmit} className="space-y-12">
-                {selectedTier && (
-                  <div className="bg-accent/5 border border-accent/20 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <ShieldCheck className="text-accent" size={18} />
-                      <span className="font-mono text-[10px] uppercase tracking-widest text-neutral-400">Security Layer Armed</span>
-                    </div>
-                    <div className="font-sans text-sm font-medium text-white px-4 py-1.5 border border-white/10 bg-white/5">
-                      Target: {selectedTier}
-                    </div>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                  <div className="space-y-4">
-                    <label className="block font-mono text-[10px] uppercase tracking-widest text-neutral-500">Client Identity</label>
-                    <input 
-                      required
-                      type="text" 
-                      placeholder="Your Name" 
-                      value={formData.name}
-                      onChange={(e) => setFormData({...formData, name: e.target.value})}
-                      className="w-full bg-transparent border-b border-white/10 py-4 font-sans text-white focus:outline-none focus:border-accent transition-colors placeholder:text-neutral-800" 
-                    />
-                  </div>
-                  <div className="space-y-4">
-                    <label className="block font-mono text-[10px] uppercase tracking-widest text-neutral-500">Comms Channel</label>
-                    <input 
-                      required
-                      type="email" 
-                      placeholder="email@address.com" 
-                      value={formData.email}
-                      onChange={(e) => setFormData({...formData, email: e.target.value})}
-                      className="w-full bg-transparent border-b border-white/10 py-4 font-sans text-white focus:outline-none focus:border-accent transition-colors placeholder:text-neutral-800" 
-                    />
-                  </div>
-                </div>
-
                 <div className="space-y-6">
                   <div className="flex justify-between items-center">
                     <label className="block font-mono text-[10px] uppercase tracking-widest text-neutral-500">Project Schematics</label>
@@ -256,8 +251,107 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
                     Next Phase <ArrowRight size={14} />
                   </button>
                   <p className="font-sans text-[11px] text-neutral-600 leading-relaxed max-w-xs uppercase tracking-wider">
-                    Strict verification required. Phase 02 will initialize the scheduling protocol.
+                    Phase 02 will initialize the scheduling protocol.
                   </p>
+                </div>
+              </form>
+            </motion.div>
+          )}
+
+          {step === "details" && (
+            <motion.div
+              key="details"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="max-w-2xl"
+            >
+              <form onSubmit={handleFinalSubmit} className="space-y-12">
+                <div className="bg-accent/5 border border-accent/20 p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-center gap-3">
+                    <Calendar className="text-accent" size={18} />
+                    <span className="font-mono text-[10px] uppercase tracking-widest text-neutral-400">Time window locked</span>
+                  </div>
+                  <div className="font-sans text-[10px] font-bold text-white uppercase tracking-widest px-4 py-1.5 border border-white/10 bg-white/5">
+                    {bookingDetails && format(bookingDetails.date, "MMM dd")} @ {bookingDetails?.time}
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                  <div className="space-y-4">
+                    <label className="block font-mono text-[10px] uppercase tracking-widest text-neutral-500">Client Identity</label>
+                    <input 
+                      required
+                      type="text" 
+                      placeholder="Your Name" 
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
+                      className="w-full bg-transparent border-b border-white/10 py-4 font-sans text-white focus:outline-none focus:border-accent transition-colors placeholder:text-neutral-800" 
+                    />
+                  </div>
+                  <div className="space-y-4">
+                    <label className="block font-mono text-[10px] uppercase tracking-widest text-neutral-500">Comms Channel</label>
+                    <input 
+                      required
+                      type="email" 
+                      placeholder="email@address.com" 
+                      value={formData.email}
+                      onChange={(e) => setFormData({...formData, email: e.target.value})}
+                      className="w-full bg-transparent border-b border-white/10 py-4 font-sans text-white focus:outline-none focus:border-accent transition-colors placeholder:text-neutral-800" 
+                    />
+                  </div>
+                </div>
+
+                {/* Discount Section */}
+                <div className="p-8 border border-white/10 bg-white/[0.02] rounded-xl space-y-6">
+                  <div className="flex items-center gap-3">
+                    <Ticket size={18} className="text-accent" />
+                    <h3 className="text-[10px] font-bold uppercase tracking-widest">Protocol Voucher</h3>
+                  </div>
+                  <div className="flex gap-2">
+                    <input 
+                      type="text" 
+                      value={discountCode}
+                      onChange={e => setDiscountCode(e.target.value.toUpperCase())}
+                      placeholder="ENTER CODE"
+                      className={`flex-1 bg-black border ${discountError ? 'border-red-500' : 'border-white/10'} p-3 font-mono text-[10px] outline-none focus:border-accent transition-colors`}
+                    />
+                    <button 
+                      type="button"
+                      onClick={handleApplyDiscount}
+                      className="px-6 bg-white text-black font-mono text-[10px] uppercase hover:bg-accent transition-colors"
+                    >
+                      Apply
+                    </button>
+                  </div>
+                  <AnimatePresence>
+                    {discountApplied && (
+                      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="p-3 border border-green-500/20 bg-green-500/5 text-green-500 font-mono text-[11px] uppercase">
+                        30% Logic Discount Applied: QUETTRIXLABS
+                      </motion.div>
+                    )}
+                    {discountError && (
+                      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="p-3 border border-red-500/20 bg-red-500/5 text-red-500 font-mono text-[11px] uppercase">
+                        Invalid Protocol Code
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {errorMessage && (
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-3 text-red-500 bg-red-500/5 border border-red-500/20 p-4">
+                    <X size={16} />
+                    <p className="font-mono text-[10px] uppercase tracking-widest">{errorMessage}</p>
+                  </motion.div>
+                )}
+
+                <div className="pt-8 border-t border-white/5">
+                  <button 
+                    type="submit"
+                    className="w-full bg-white text-black font-mono text-[11px] font-black px-12 py-6 uppercase tracking-[0.3em] hover:bg-accent transition-all active:scale-95 flex items-center justify-center gap-3"
+                  >
+                    Confirm & Complete <ArrowRight size={14} />
+                  </button>
                 </div>
               </form>
             </motion.div>
@@ -319,12 +413,13 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
                   </div>
                   <p className="font-sans text-sm text-neutral-400 leading-relaxed">
                     Our lead engineers have blocked this slot. Prepare your technical documentation. A Zoom link has been attached to the calendar invite.
+                    {discountApplied && <span className="block mt-4 text-green-500 font-mono text-[10px] uppercase">30% QUETTRIXLABS Discount Applied to your lab profile.</span>}
                   </p>
                 </div>
               </div>
 
               <button 
-                onClick={() => setStep("details")}
+                onClick={() => setStep("brief")}
                 className="font-mono text-[11px] uppercase tracking-widest text-neutral-500 hover:text-white transition-colors"
               >
                 Terminate Session // Return to Top
