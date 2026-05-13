@@ -1,0 +1,45 @@
+{
+  "entities": {
+    "monitored_site": {
+      "title": "Monitored Site",
+      "description": "A website registered for automated daily monitoring.",
+      "type": "object",
+      "properties": {
+        "ownerId": { "type": "string", "description": "The UID of the user who owns this monitoring." },
+        "url": { "type": "string", "format": "uri", "description": "The URL of the monitored site." },
+        "name": { "type": "string", "description": "Human-readable identifier for the site." },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Timestamp when the site was added." },
+        "status": { "type": "string", "enum": ["active", "inactive", "error"] },
+        "lastAudit": { "type": "object", "description": "Summary of the most recent audit results." }
+      },
+      "required": ["ownerId", "url", "createdAt"]
+    },
+    "audit_log": {
+      "title": "Audit Log",
+      "description": "History of daily monitoring audits for a specific site.",
+      "type": "object",
+      "properties": {
+        "timestamp": { "type": "string", "format": "date-time" },
+        "latency": { "type": "number" },
+        "traffic": { "type": "number" },
+        "cpu": { "type": "number" },
+        "memory": { "type": "number" },
+        "bandwidth": { "type": "number" },
+        "errors": { "type": "number" },
+        "rank": { "type": "number" },
+        "status": { "type": "string" }
+      },
+      "required": ["timestamp"]
+    }
+  },
+  "firestore": {
+    "/monitored_sites/{siteId}": {
+      "schema": "monitored_site",
+      "description": "Collection of sites registered for monitoring."
+    },
+    "/monitored_sites/{siteId}/audits/{auditId}": {
+      "schema": "audit_log",
+      "description": "Historical audit logs for a monitored site."
+    }
+  }
+}

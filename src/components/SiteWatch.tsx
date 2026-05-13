@@ -5,7 +5,7 @@ import {
   BarChart3, Info, AlertTriangle, CheckCircle2, Settings as SettingsIcon, 
   Bell, TrendingUp, MousePointer2, History, PieChart as PieIcon, 
   BarChart4, ChevronDown, ChevronUp, Share2, Server, Timer, Download,
-  Ticket
+  Ticket, Bookmark, BookmarkPlus, Trash2, LayoutDashboard
 } from "lucide-react";
 import { GoogleGenAI } from "@google/genai";
 import { 
@@ -15,6 +15,19 @@ import {
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import { NetworkGraph } from "./NetworkGraph";
+import { useAuth } from "../lib/authContext";
+import { db, signInWithGoogle, handleFirestoreError, OperationType } from "../lib/firebase";
+import { 
+  collection, 
+  addDoc, 
+  query, 
+  where, 
+  onSnapshot, 
+  serverTimestamp, 
+  deleteDoc, 
+  doc, 
+  orderBy
+} from "firebase/firestore";
 
 // Mock data generators
 const generateTimeSeries = (points: number) => 
@@ -74,7 +87,18 @@ interface Thresholds {
   maxErrorRate: number;
 }
 
+interface MonitoredSite {
+  id: string;
+  url: string;
+  ownerId: string;
+  createdAt: any;
+  status: string;
+}
+
 export const SiteWatch = () => {
+  const { user, loading } = useAuth();
+  const isAdmin = user?.uid && user.uid === import.meta.env.VITE_ADMIN_UID;
+  
   const [url, setUrl] = useState("");
   const [urlError, setUrlError] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
@@ -86,6 +110,9 @@ export const SiteWatch = () => {
   const [liveData, setLiveData] = useState(generateTimeSeries(20));
   const [anomalies, setAnomalies] = useState<{ id: string; type: string; timestamp: string; severity: "low" | "high" }[]>([]);
   const [automations, setAutomations] = useState<{ id: string; action: string; status: "complete" | "running"; timestamp: string }[]>([]);
+  const [monitoredSites, setMonitoredSites] = useState<MonitoredSite[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
+  const [view, setView] = useState<"scan" | "monitored">("scan");
   
   const [thresholds, setThresholds] = useState<Thresholds>(() => {
     const saved = localStorage.getItem('quettrix_thresholds');
@@ -261,6 +288,64 @@ export const SiteWatch = () => {
     if (saved) setHistory(JSON.parse(saved));
   }, []);
 
+  // Monitor sites from Firestore
+  useEffect(() => {
+    if (!user) {
+      setMonitoredSites([]);
+      return;
+    }
+
+    const q = query(
+      collection(db, "monitored_sites"), 
+      where("ownerId", "==", user.uid),
+      orderBy("createdAt", "desc")
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const sites = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as MonitoredSite[];
+      setMonitoredSites(sites);
+    }, (error) => {
+      handleFirestoreError(error, OperationType.LIST, "monitored_sites");
+    });
+
+    return unsubscribe;
+  }, [user]);
+
+  const handleSaveSite = async () => {
+    if (!user || !data) return;
+    setIsSaving(true);
+    const path = "monitored_sites";
+    try {
+      await addDoc(collection(db, path), {
+        ownerId: user.uid,
+        url: data.url,
+        createdAt: serverTimestamp(),
+        status: "active",
+        lastAudit: {
+          visibilityScore: aiAudit?.visibilityScore || 0,
+          timestamp: Date.now()
+        }
+      });
+      setIsSettingsOpen(false); 
+    } catch (err) {
+      handleFirestoreError(err, OperationType.CREATE, path);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteSite = async (siteId: string) => {
+    const path = `monitored_sites/${siteId}`;
+    try {
+      await deleteDoc(doc(db, "monitored_sites", siteId));
+    } catch (err) {
+      handleFirestoreError(err, OperationType.DELETE, path);
+    }
+  };
+
   const validateUrl = (value: string) => {
     if (!value) {
       setUrlError(null);
@@ -338,6 +423,44 @@ export const SiteWatch = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="pt-32 pb-24 px-6 md:px-16 min-h-screen bg-black text-white font-sans flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-white/10 border-t-accent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="pt-32 pb-24 px-6 md:px-16 min-h-screen bg-black text-white font-sans flex items-center justify-center">
+        <div className="max-w-md w-full p-12 border border-red-500/20 bg-red-500/5 text-center space-y-6">
+          <AlertTriangle size={48} className="text-red-500 mx-auto animate-pulse" />
+          <h2 className="font-mono text-xs uppercase tracking-[0.4em] text-red-500">Access Denied</h2>
+          <p className="font-sans text-sm text-neutral-400">
+            Protocol Error: The SiteWatch observatory is restricted to authorized personnel. 
+            Sign in as the primary administrator to gain access.
+          </p>
+          {!user ? (
+            <button 
+              onClick={() => signInWithGoogle()}
+              className="px-8 py-3 bg-white text-black font-mono text-[10px] uppercase font-bold hover:bg-accent transition-all"
+            >
+              Establish Link
+            </button>
+          ) : (
+            <button 
+              onClick={() => window.location.href = '/'}
+              className="px-8 py-3 bg-red-500/10 border border-red-500/20 text-red-500 font-mono text-[10px] uppercase hover:bg-red-500 hover:text-white transition-all"
+            >
+              Return to Surface
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="pt-32 pb-24 px-6 md:px-16 min-h-screen bg-black text-white font-sans selection:bg-accent selection:text-black">
       <div className="max-w-7xl mx-auto">
@@ -352,48 +475,157 @@ export const SiteWatch = () => {
             </p>
           </motion.div>
           <div className="flex gap-4">
+            <button 
+              onClick={() => setView(view === 'scan' ? 'monitored' : 'scan')}
+              className={`flex items-center gap-2 px-6 py-4 border rounded-lg transition-all group ${
+                view === 'monitored' ? 'border-accent bg-accent/5 font-bold' : 'border-white/10 hover:border-accent'
+              }`}
+            >
+              {view === 'monitored' ? <LayoutDashboard size={18} /> : <Bookmark size={18} />}
+              <span className="font-mono text-[10px] uppercase tracking-widest">
+                {view === 'monitored' ? 'Main Grid' : 'Pinned sites'}
+              </span>
+              {monitoredSites.length > 0 && view === 'scan' && (
+                <span className="bg-accent text-black text-[9px] px-1.5 rounded-full font-black animate-pulse">
+                  {monitoredSites.length}
+                </span>
+              )}
+            </button>
             <button onClick={() => setIsSettingsOpen(!isSettingsOpen)} className="p-4 border border-white/10 rounded-lg hover:border-accent transition-all group">
               <SettingsIcon size={20} className="group-hover:rotate-90 transition-transform duration-500" />
             </button>
           </div>
         </div>
 
-        <AnimatePresence>
-          {isSettingsOpen && (
-            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden mb-8 border border-white/10 p-6 bg-white/[0.02] rounded-xl">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <ThresholdControl label="Latency Limit (ms)" value={thresholds.maxResponseTime} onChange={v => setThresholds({...thresholds, maxResponseTime: v})} min={100} max={2000} />
-                <ThresholdControl label="Visibility Floor (%)" value={thresholds.minVisibilityScore} onChange={v => setThresholds({...thresholds, minVisibilityScore: v})} min={1} max={100} />
-                <ThresholdControl label="Failure Tolerance (%)" value={thresholds.maxErrorRate} onChange={v => setThresholds({...thresholds, maxErrorRate: v})} min={0} max={5} />
-              </div>
+        <AnimatePresence mode="wait">
+          {view === 'scan' ? (
+            <motion.div 
+              key="scan-view"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+            >
+              <AnimatePresence>
+                {isSettingsOpen && (
+                  <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden mb-8 border border-white/10 p-6 bg-white/[0.02] rounded-xl">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                      <ThresholdControl label="Latency Limit (ms)" value={thresholds.maxResponseTime} onChange={v => setThresholds({...thresholds, maxResponseTime: v})} min={100} max={2000} />
+                      <ThresholdControl label="Visibility Floor (%)" value={thresholds.minVisibilityScore} onChange={v => setThresholds({...thresholds, minVisibilityScore: v})} min={1} max={100} />
+                      <ThresholdControl label="Failure Tolerance (%)" value={thresholds.maxErrorRate} onChange={v => setThresholds({...thresholds, maxErrorRate: v})} min={0} max={5} />
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <form onSubmit={handleAnalyze} className="mb-12">
+                <div className="flex flex-col md:flex-row gap-4 relative">
+                  <div className="flex-1 relative">
+                      <input 
+                        value={url} 
+                        onChange={e => {
+                          setUrl(e.target.value);
+                          if (urlError) validateUrl(e.target.value);
+                        }} 
+                        onBlur={() => validateUrl(url)}
+                        placeholder="TARGET UPLINK (e.g. google.com)" 
+                        className={`w-full bg-white/5 border ${urlError ? 'border-red-500' : 'border-white/10'} p-5 font-mono uppercase text-sm outline-none focus:border-accent transition-colors`} 
+                      />
+                      <AnimatePresence>
+                        {urlError && (
+                          <motion.div initial={{ y: 5, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 5, opacity: 0 }} className="absolute -bottom-6 left-0 text-[10px] text-red-500 font-mono uppercase">
+                            {urlError}
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+                  </div>
+                  <button type="submit" className="bg-white text-black px-12 font-bold uppercase hover:bg-accent transition-all active:scale-95">Invoke Scan</button>
+                </div>
+              </form>
+            </motion.div>
+          ) : (
+            <motion.div 
+              key="monitored-view"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="space-y-6 mb-12"
+            >
+              {!user ? (
+                <div className="py-20 text-center border border-dashed border-white/10 rounded-2xl bg-white/[0.01]">
+                  <Globe size={48} className="text-neutral-800 mx-auto mb-6 opacity-30" />
+                  <p className="font-mono text-[10px] uppercase tracking-[0.5em] text-neutral-600 mb-6">Authentication Required for Persistent Monitoring</p>
+                  <button 
+                    onClick={() => signInWithGoogle()}
+                    className="px-8 py-3 bg-white text-black font-mono text-[10px] uppercase font-bold hover:bg-accent transition-all"
+                  >
+                    Establish Link
+                  </button>
+                </div>
+              ) : monitoredSites.length === 0 ? (
+                <div className="py-20 text-center border border-dashed border-white/10 rounded-2xl bg-white/[0.01]">
+                  <Bookmark size={48} className="text-neutral-800 mx-auto mb-6 opacity-30" />
+                  <p className="font-mono text-[10px] uppercase tracking-[0.5em] text-neutral-600 mb-6">No Pinned Observatories Found</p>
+                  <button 
+                    onClick={() => setView('scan')}
+                    className="px-8 py-3 border border-white/10 text-white font-mono text-[10px] uppercase hover:border-accent transition-all"
+                  >
+                    Initialize New Scan
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {monitoredSites.map(site => (
+                    <div 
+                      key={site.id} 
+                      className="p-6 border border-white/10 bg-white/[0.02] rounded-xl hover:border-accent group transition-all"
+                    >
+                      <div className="flex justify-between items-start mb-6">
+                        <div className="p-3 bg-white/5 rounded-lg">
+                          <Globe size={20} className="text-accent" />
+                        </div>
+                        <button 
+                          onClick={() => handleDeleteSite(site.id)}
+                          className="p-2 text-neutral-600 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                      <h3 className="font-bold tracking-tighter truncate mb-1">{site.url}</h3>
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                        <span className="text-[10px] font-mono uppercase text-neutral-500">Live Status: Active</span>
+                      </div>
+                      
+                      {/* @ts-ignore */}
+                      {site.lastAudit && (
+                        <div className="mb-6 p-3 bg-white/5 border border-white/5 rounded-lg flex items-center justify-between">
+                          <div className="flex flex-col">
+                            <span className="text-[8px] uppercase text-neutral-600 font-mono">Last Score</span>
+                            {/* @ts-ignore */}
+                            <span className="text-xs font-black text-accent">{site.lastAudit.visibilityScore}%</span>
+                          </div>
+                          <div className="flex flex-col items-end">
+                            <span className="text-[8px] uppercase text-neutral-600 font-mono">Telemetry</span>
+                            <span className="text-[9px] font-mono text-neutral-400">STABLE</span>
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="flex gap-2">
+                        <button 
+                          onClick={() => { setUrl(site.url); handleAnalyze({ preventDefault: () => {} } as any); setView('scan'); }}
+                          className="flex-1 bg-white text-black py-3 font-mono text-[10px] uppercase font-bold hover:bg-accent transition-all"
+                        >
+                          Full Audit
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>
-
-        <form onSubmit={handleAnalyze} className="mb-12">
-          <div className="flex flex-col md:flex-row gap-4 relative">
-             <div className="flex-1 relative">
-                <input 
-                  value={url} 
-                  onChange={e => {
-                    setUrl(e.target.value);
-                    if (urlError) validateUrl(e.target.value);
-                  }} 
-                  onBlur={() => validateUrl(url)}
-                  placeholder="TARGET UPLINK (e.g. google.com)" 
-                  className={`w-full bg-white/5 border ${urlError ? 'border-red-500' : 'border-white/10'} p-5 font-mono uppercase text-sm outline-none focus:border-accent transition-colors`} 
-                />
-                <AnimatePresence>
-                  {urlError && (
-                    <motion.div initial={{ y: 5, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 5, opacity: 0 }} className="absolute -bottom-6 left-0 text-[10px] text-red-500 font-mono uppercase">
-                      {urlError}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-             </div>
-             <button type="submit" className="bg-white text-black px-12 font-bold uppercase hover:bg-accent transition-all active:scale-95">Invoke Scan</button>
-          </div>
-        </form>
 
         {alerts.length > 0 && (
           <div className="mb-8 space-y-2">
@@ -666,6 +898,24 @@ export const SiteWatch = () => {
                         </div>
                         
                         <div className="pt-6 border-t border-white/5 space-y-4">
+                          {user && !monitoredSites.some(s => s.url === data.url) && (
+                            <button 
+                              onClick={handleSaveSite}
+                              disabled={isSaving}
+                              className="w-full py-4 font-mono text-[10px] uppercase tracking-widest bg-white/5 border border-white/10 text-white hover:border-accent transition-all flex items-center justify-center gap-2"
+                            >
+                               <BookmarkPlus size={14} className={isSaving ? 'animate-pulse' : ''} />
+                               {isSaving ? 'Establishing Persistence...' : 'Pin for Persistent Monitoring'}
+                            </button>
+                          )}
+
+                          {monitoredSites.some(s => s.url === data.url) && (
+                            <div className="w-full py-4 font-mono text-[10px] uppercase tracking-widest bg-accent/10 border border-accent/20 text-accent flex items-center justify-center gap-2">
+                               <ShieldCheck size={14} />
+                               Active Persistence Protocol
+                            </div>
+                          )}
+
                           <button 
                             onClick={handleSubmitReview}
                             disabled={isSubmitting || submitSuccess}

@@ -1,24 +1,32 @@
 import { motion, AnimatePresence } from "motion/react";
 import React, { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, Zap, ArrowUpRight } from "lucide-react";
+import { Menu, X, Zap, ArrowUpRight, User, LogOut } from "lucide-react";
+import { useAuth } from "../lib/authContext";
+import { signInWithGoogle, signOut } from "../lib/firebase";
 
 const links = [
   { name: "Services", href: "#services" },
   { name: "Portfolio", href: "#work" },
-  { name: "Site Watch", href: "/site-watch" },
   { name: "Pricing", href: "#pricing" },
   { name: "Common Questions", href: "#faq" },
   { name: "Tools", href: "#tech" },
+  { name: "Site Watch", href: "/site-watch" },
 ];
 
 export const Navbar = () => {
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-
+  const { user } = useAuth();
+  const isAdmin = user?.uid && user.uid === import.meta.env.VITE_ADMIN_UID;
   const location = useLocation();
   const navigate = useNavigate();
+
+  const navLinks = React.useMemo(() => {
+    const baseLinks = isAdmin ? links : links.filter(l => l.name !== "Site Watch");
+    return baseLinks;
+  }, [isAdmin]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -78,7 +86,7 @@ export const Navbar = () => {
       
       {/* Desktop Links */}
       <div id="nav-links" className="hidden md:flex gap-6 lg:gap-8">
-        {links.map((link) => (
+        {navLinks.map((link) => (
           <a
             key={link.name}
             href={link.href}
@@ -102,6 +110,31 @@ export const Navbar = () => {
       </div>
 
       <div className="flex items-center gap-4">
+        {user ? (
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex flex-col items-end">
+              {isAdmin && <span className="text-[7px] font-mono text-accent border border-accent/30 px-1 mb-0.5 rounded-sm animate-pulse">LAB ACCESS</span>}
+              <span className="text-[9px] font-mono uppercase text-neutral-500 tracking-widest">Operator</span>
+              <span className="text-[10px] font-bold text-white uppercase truncate max-w-[100px]">{user.displayName || 'Agent'}</span>
+            </div>
+            <button 
+              onClick={() => signOut()}
+              className="p-2 border border-white/10 rounded hover:border-red-500/50 hover:bg-red-500/5 transition-all group"
+              title="Sign Out"
+            >
+              <LogOut size={16} className="text-neutral-500 group-hover:text-red-500" />
+            </button>
+          </div>
+        ) : (
+          <button 
+            onClick={() => signInWithGoogle()}
+            className="hidden sm:flex items-center gap-2 border border-white/10 px-4 py-2 font-mono text-[10px] uppercase tracking-widest hover:border-accent transition-all"
+          >
+            <User size={14} />
+            Sign In
+          </button>
+        )}
+
         <button 
           onClick={scrollToContact}
           id="cta-nav" 
@@ -130,7 +163,7 @@ export const Navbar = () => {
             className="fixed left-0 right-0 top-[60px] md:top-[76px] bg-black border-t border-border z-[49] flex flex-col p-8 md:hidden shadow-2xl pb-12"
           >
             <div className="flex flex-col gap-6">
-              {links.map((link) => (
+              {navLinks.map((link) => (
                 <a
                   key={link.name}
                   href={link.href}
@@ -140,12 +173,31 @@ export const Navbar = () => {
                   {link.name}
                 </a>
               ))}
+              
+              {!user && (
+                <button 
+                  onClick={() => { signInWithGoogle(); setIsMobileMenuOpen(false); }}
+                  className="w-full border border-white/20 text-white font-mono text-xs font-medium py-5 uppercase tracking-widest mt-4"
+                >
+                  Sign In
+                </button>
+              )}
+
               <button 
                 onClick={scrollToContact}
                 className="w-full bg-white text-black font-mono text-xs font-medium py-5 uppercase tracking-widest mt-4"
               >
                 Start a Project
               </button>
+
+              {user && (
+                <button 
+                  onClick={() => { signOut(); setIsMobileMenuOpen(false); }}
+                  className="w-full border border-red-500/20 text-red-500 font-mono text-xs font-medium py-5 uppercase tracking-widest mt-4"
+                >
+                  Sign Out
+                </button>
+              )}
             </div>
           </motion.div>
         )}
