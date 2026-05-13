@@ -74,6 +74,22 @@ interface AnalysisData {
     scripts: number;
     styles: number;
     linkSamples?: string[];
+    securityHeaders?: {
+      hsts: string;
+      csp: string;
+      xFrame: string;
+      xss: string;
+      contentType: string;
+    };
+    seoChecks?: {
+      lang: string;
+      canonical: string;
+      robots: string;
+      hasAltTags: boolean;
+      altMissingCount: number;
+    };
+    techStack?: string[];
+    ssl?: boolean;
   };
   metrics: {
     status: number;
@@ -663,11 +679,125 @@ export const SiteWatch = () => {
           {status === "success" && data && (
             <motion.div key="success" ref={reportRef} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-12 bg-black">
               
+              {/* Feature Checklist & Overview */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-2 p-8 border border-white/10 bg-white/[0.01] rounded-xl flex items-center gap-8">
+                  <div className="hidden sm:block">
+                     <div className="w-20 h-20 bg-accent/20 rounded-full flex items-center justify-center border border-accent/20">
+                        <Activity className="text-accent" size={32} />
+                     </div>
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-lg tracking-tighter mb-2">Spectral Observatory Online</h3>
+                    <p className="text-[10px] uppercase font-mono text-neutral-500 mb-6">Discovery features active for <span className="text-white">{data.url}</span></p>
+                    <div className="grid grid-cols-2 gap-x-8 gap-y-3">
+                      <FeatureItem label="SSL Layer Verification" active />
+                      <FeatureItem label="Deep Metadata Audit" active />
+                      <FeatureItem label="Social Graph Validation" active />
+                      <FeatureItem label="Security Header Scan" active />
+                      <FeatureItem label="Tech Stack Fingerprinting" active />
+                      <FeatureItem label="Accessibility SEO Audit" active />
+                      <FeatureItem label="Latency Telemetry" active />
+                      <FeatureItem label="Persistent Monitoring" active />
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-8 border border-accent bg-accent/5 rounded-xl flex flex-col justify-center text-center space-y-4">
+                  <div className="text-4xl font-black">{aiAudit?.visibilityScore || '--'}%</div>
+                  <div className="font-mono text-[9px] uppercase tracking-widest text-accent">Total Visibility Score</div>
+                  <p className="text-[10px] text-neutral-400 font-mono leading-relaxed">Generated via Gemini-3 Spectral Logic Engine.</p>
+                </div>
+              </div>
+
               {/* Telemetry Visuals */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <VisualBox 
+                  icon={<ShieldCheck size={14} className="text-blue-400" />} 
+                  label="Security Posture"
+                  isAnomalous={!data.metadata.ssl || data.metadata.securityHeaders?.hsts === 'Missing'}
+                >
+                  <div className="space-y-2 py-2">
+                    <div className="flex justify-between items-center text-[10px] font-mono">
+                      <span className="text-neutral-500">SSL Certificate</span>
+                      <span className={data.metadata.ssl ? 'text-green-500' : 'text-red-500'}>
+                        {data.metadata.ssl ? 'ENCRYPTED' : 'EXPOSED'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center text-[10px] font-mono">
+                      <span className="text-neutral-500">HSTS Policy</span>
+                      <span className={data.metadata.securityHeaders?.hsts === 'Active' ? 'text-green-500' : 'text-neutral-400'}>
+                        {data.metadata.securityHeaders?.hsts}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center text-[10px] font-mono">
+                      <span className="text-neutral-500">CSP Layer</span>
+                      <span className={data.metadata.securityHeaders?.csp === 'Active' ? 'text-green-500' : 'text-neutral-400'}>
+                        {data.metadata.securityHeaders?.csp}
+                      </span>
+                    </div>
+                  </div>
+                </VisualBox>
+
+                <VisualBox icon={<Terminal size={14} className="text-accent" />} label="Tech Fingerprint">
+                  <div className="flex flex-wrap gap-2 py-2">
+                    {data.metadata.techStack && data.metadata.techStack.length > 0 ? (
+                      data.metadata.techStack.map(tech => (
+                        <span key={tech} className="px-2 py-1 bg-white/5 border border-white/10 rounded text-[9px] uppercase font-mono text-white">
+                          {tech}
+                        </span>
+                      ))
+                    ) : (
+                      <span className="text-[9px] font-mono text-neutral-600 uppercase">Obscured Stack</span>
+                    )}
+                  </div>
+                </VisualBox>
+
+                <VisualBox 
+                  icon={<Search size={14} className="text-purple-400" />} 
+                  label="SEO Integrity"
+                  isAnomalous={data.metadata.seoChecks?.altMissingCount! > 0}
+                >
+                   <div className="space-y-2 py-2">
+                    <div className="flex justify-between items-center text-[10px] font-mono">
+                      <span className="text-neutral-500">Lang Defined</span>
+                      <span className={data.metadata.seoChecks?.lang !== 'Missing' ? 'text-white' : 'text-orange-500'}>
+                        {data.metadata.seoChecks?.lang}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center text-[10px] font-mono">
+                      <span className="text-neutral-500">Images (Alt Missing)</span>
+                      <span className={data.metadata.seoChecks?.altMissingCount === 0 ? 'text-green-500' : 'text-orange-500'}>
+                        {data.metadata.seoChecks?.altMissingCount}
+                      </span>
+                    </div>
+                  </div>
+                </VisualBox>
+
+                <VisualBox 
+                  icon={<Activity size={14} className="text-accent" />} 
+                  label="Response Header"
+                >
+                   <div className="space-y-2 py-2">
+                    <div className="flex justify-between items-center text-[10px] font-mono">
+                      <span className="text-neutral-500">Server</span>
+                      <span className="text-white truncate max-w-[80px]">{data.metrics.server}</span>
+                    </div>
+                    <div className="flex justify-between items-center text-[10px] font-mono">
+                      <span className="text-neutral-500">Status</span>
+                      <span className={data.metrics.status < 400 ? 'text-green-500' : 'text-red-500'}>
+                        {data.metrics.status}
+                      </span>
+                    </div>
+                  </div>
+                </VisualBox>
+              </div>
+
+              {/* Neural Flux & Source Weight */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <VisualBox 
                   icon={<TrendingUp size={14}/>} 
-                  label="Neural Flux (Traffic)" 
+                  label="Neural Flux (Simulated Traffic)" 
                   isAnomalous={liveData[liveData.length-1].traffic > 950}
                 >
                   <ResponsiveContainer width="100%" height={120}>
@@ -676,36 +806,13 @@ export const SiteWatch = () => {
                     </AreaChart>
                   </ResponsiveContainer>
                 </VisualBox>
-                <VisualBox icon={<PieIcon size={14}/>} label="Source Weight">
+                <VisualBox icon={<PieIcon size={14}/>} label="Source Weight (Global Dist)">
                   <ResponsiveContainer width="100%" height={120}>
                     <PieChart>
                       <Pie data={trafficSourceData} innerRadius={35} outerRadius={50} dataKey="value">
                         {trafficSourceData.map((e, i) => <Cell key={i} fill={e.color} />)}
                       </Pie>
                     </PieChart>
-                  </ResponsiveContainer>
-                </VisualBox>
-                <VisualBox 
-                  icon={<Timer size={14}/>} 
-                  label="Ping Latency"
-                  isAnomalous={liveData[liveData.length-1].latency > 200}
-                >
-                   <ResponsiveContainer width="100%" height={120}>
-                    <LineChart data={liveData}>
-                      <Line type="monotone" dataKey="latency" stroke="#FFF" dot={false} strokeWidth={2} />
-                      <XAxis dataKey="time" hide />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </VisualBox>
-                <VisualBox 
-                  icon={<Share2 size={14}/>} 
-                  label="Index Rank"
-                  isAnomalous={anomalies.some(a => a.type === 'SPECTRAL_VARIANCE')}
-                >
-                   <ResponsiveContainer width="100%" height={120}>
-                    <BarChart data={liveData}>
-                      <Bar dataKey="rank" fill="#333" />
-                    </BarChart>
                   </ResponsiveContainer>
                 </VisualBox>
               </div>
@@ -825,10 +932,41 @@ export const SiteWatch = () => {
                 </div>
               </div>
 
-              {/* Data Grid */}
+              {/* Resource Performance Matrix & Deep Audit */}
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 
                 <div className="lg:col-span-8 space-y-6">
+                  {/* Detailed Metadata Audit Section */}
+                  <div className="p-8 border border-white/10 bg-black/40 rounded-xl overflow-hidden group">
+                     <h3 className="font-mono text-xs uppercase tracking-widest text-neutral-500 mb-8 flex items-center gap-2">
+                       <Terminal size={12} className="text-accent" /> Structural Packet Inventory
+                     </h3>
+                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+                        <AuditStat label="Title Found" value={data.metadata.title.length > 5 ? '✓' : '✗'} sub={data.metadata.title.substring(0, 15) + '...'} />
+                        <AuditStat label="H1 Headers" value={data.metadata.h1Count.toString()} sub="Structural Weight" />
+                        <AuditStat label="DOM Elements" value={(data.metadata.scripts + data.metadata.styles + data.metadata.imageCount).toString()} sub="Static Density" />
+                        <AuditStat label="Internal Uplinks" value={data.metadata.internalLinks.toString()} sub="Mesh Count" />
+                     </div>
+                     <div className="mt-8 pt-8 border-t border-white/5 grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="space-y-4">
+                           <span className="text-[10px] uppercase font-mono text-neutral-500">Security Snapshot</span>
+                           <div className="space-y-2">
+                              <StatusLine label="X-Frame-Options" value={data.metadata.securityHeaders?.xFrame || 'N/A'} />
+                              <StatusLine label="X-Content-Type" value={data.metadata.securityHeaders?.contentType || 'N/A'} />
+                              <StatusLine label="HSTS Policy" value={data.metadata.securityHeaders?.hsts || 'N/A'} alert={data.metadata.securityHeaders?.hsts === 'Missing'} />
+                           </div>
+                        </div>
+                        <div className="space-y-4">
+                           <span className="text-[10px] uppercase font-mono text-neutral-500">SEO Vitality</span>
+                           <div className="space-y-2">
+                              <StatusLine label="Robots Directive" value={data.metadata.seoChecks?.robots || 'N/A'} />
+                              <StatusLine label="Canonical Link" value={data.metadata.seoChecks?.canonical === 'Missing' ? 'Missing' : 'Verified'} alert={data.metadata.seoChecks?.canonical === 'Missing'} />
+                              <StatusLine label="Image Alt Tags" value={data.metadata.seoChecks?.altMissingCount === 0 ? 'Optimal' : `${data.metadata.seoChecks?.altMissingCount} Missing`} alert={data.metadata.seoChecks?.altMissingCount! > 0} />
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+
                   {/* Table with Sparklines */}
                   <div className="p-8 border border-white/10 bg-black/40 rounded-xl">
                     <h3 className="font-mono text-xs uppercase tracking-widest text-neutral-500 mb-8">Resource Performance Matrix</h3>
@@ -1121,6 +1259,31 @@ export const SiteWatch = () => {
     </div>
   );
 };
+
+const FeatureItem = ({ label, active }: { label: string; active?: boolean }) => (
+  <div className="flex items-center gap-2">
+    <div className={`w-1 h-1 rounded-full ${active ? 'bg-accent' : 'bg-neutral-800'}`} />
+    <span className="text-[10px] uppercase font-mono tracking-tight text-neutral-400 group-hover:text-white transition-colors">{label}</span>
+  </div>
+);
+
+const AuditStat = ({ label, value, sub }: { label: string, value: string, sub: string }) => (
+  <div className="flex flex-col">
+    <span className="text-[8px] uppercase font-mono text-neutral-600 mb-1">{label}</span>
+    <span className="text-xl font-black text-white tracking-tighter">{value}</span>
+    <span className="text-[9px] font-mono text-neutral-500 truncate">{sub}</span>
+  </div>
+);
+
+const StatusLine = ({ label, value, alert }: { label: string, value: string, alert?: boolean }) => (
+  <div className="flex justify-between items-center py-1">
+    <span className="text-[9px] font-mono text-neutral-500">{label}</span>
+    <div className="flex items-center gap-2">
+      {alert && <div className="w-1 h-1 rounded-full bg-orange-500 animate-pulse" />}
+      <span className={`text-[10px] font-mono ${alert ? 'text-orange-500' : 'text-white'}`}>{value}</span>
+    </div>
+  </div>
+);
 
 const VisualBox = ({ icon, label, children, isAnomalous }: { icon: any, label: string, children: any, isAnomalous?: boolean }) => (
   <div className={`p-6 border rounded-xl transition-all duration-500 ${

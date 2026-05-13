@@ -45,6 +45,34 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }
     });
 
+    // Advanced SEO & Security Checks
+    const securityHeaders = {
+      hsts: response.headers.get("strict-transport-security") ? "Active" : "Missing",
+      csp: response.headers.get("content-security-policy") ? "Active" : "Missing",
+      xFrame: response.headers.get("x-frame-options") || "Missing",
+      xss: response.headers.get("x-xss-protection") || "Missing",
+      contentType: response.headers.get("x-content-type-options") || "Missing",
+    };
+
+    const seoChecks = {
+      lang: $("html").attr("lang") || "Missing",
+      canonical: $('link[rel="canonical"]').attr("href") || "Missing",
+      robots: $('meta[name="robots"]').attr("content") || "Not Set",
+      hasAltTags: $("img").length === 0 || $("img[alt]").length > 0,
+      altMissingCount: $("img").length - $("img[alt]").length,
+    };
+
+    const techStack = [];
+    if (html.includes("wp-content")) techStack.push("WordPress");
+    if (html.includes("_next/static") || html.includes("__NEXT_DATA__")) techStack.push("Next.js");
+    if (html.includes("nuxt") || html.includes("__NUXT__")) techStack.push("Nuxt.js");
+    if (html.includes("react")) techStack.push("React");
+    if (html.includes("vue")) techStack.push("Vue.js");
+    if (html.includes("jquery")) techStack.push("jQuery");
+    if (response.headers.get("server")?.toLowerCase().includes("cloudflare") || response.headers.get("cf-ray")) techStack.push("Cloudflare");
+    if (response.headers.get("server")?.toLowerCase().includes("nginx")) techStack.push("Nginx");
+    if (response.headers.get("server")?.toLowerCase().includes("apache")) techStack.push("Apache");
+
     const metadata = {
       title: $("title").text() || "No title found",
       description: $('meta[name="description"]').attr("content") || "No description found",
@@ -63,6 +91,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       scripts: $("script").length,
       styles: $("link[rel='stylesheet']").length,
       keywords: $('meta[name="keywords"]').attr("content") || null,
+      securityHeaders,
+      seoChecks,
+      techStack,
+      ssl: formattedUrl.startsWith("https")
     };
 
     // Simulate some "Observability" metrics based on the response headers
@@ -70,7 +102,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       status: response.status,
       contentType: response.headers.get("content-type"),
       server: response.headers.get("server") || "Hidden",
-      responseTime: 0, // Frontend will measure this better or we can timestamp here
+      responseTime: 0,
     };
 
     return res.status(200).json({ metadata, metrics, rawHtml: html.substring(0, 5000) });
