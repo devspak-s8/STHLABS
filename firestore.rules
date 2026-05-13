@@ -38,31 +38,17 @@ service cloud.firestore {
     }
 
     function isAdmin() {
-      return isSignedIn() && request.auth.uid == "mZIuMPDgDJdSqNqOXtTtNnqyADt1";
+      return isSignedIn() && 
+             (request.auth.uid == "mZIuMPDgDJdSqNqOXtTtNnqyADt1" || 
+              (request.auth.token.email == "apatirasulayman@gmail.com" && request.auth.token.email_verified == true));
     }
 
     match /monitored_sites/{siteId} {
-      // Create: Must be the admin
-      allow create: if isAdmin() && 
-                      isValidMonitoredSite(request.resource.data) &&
-                      request.resource.data.createdAt == request.time;
-      
-      // Read: Only the admin can see their own sites
-      allow get, list: if isAdmin() && resource.data.ownerId == request.auth.uid;
-      
-      // Update: Admin can update
-      allow update: if isAdmin() && 
-                      isValidMonitoredSite(request.resource.data) &&
-                      request.resource.data.ownerId == resource.data.ownerId &&
-                      request.resource.data.createdAt == resource.data.createdAt;
-      
-      allow delete: if isAdmin();
+      // Allow the designated admin all access to verified sites
+      allow read, write: if isAdmin();
 
       match /audits/{auditId} {
-        allow get, list: if isOwner(get(/databases/$(database)/documents/monitored_sites/$(siteId)).data.ownerId);
-        allow create: if isVerified() && 
-                        isOwner(get(/databases/$(database)/documents/monitored_sites/$(siteId)).data.ownerId) && 
-                        isValidAuditLog(request.resource.data);
+        allow read, write: if isAdmin();
       }
     }
   }

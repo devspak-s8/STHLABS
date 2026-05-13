@@ -16,6 +16,15 @@ export const signInWithGoogle = async () => {
   try {
     authPromise = signInWithPopup(auth, googleProvider);
     const result = await authPromise;
+    
+    // Strict Access Control: Only allow the designated operator
+    if (result.user.email !== 'apatirasulayman@gmail.com') {
+      await auth.signOut();
+      const unauthorizedError = new Error('Access Denied: Your account is not authorized to access this terminal.');
+      (unauthorizedError as any).code = 'auth/unauthorized-operator';
+      throw unauthorizedError;
+    }
+    
     return result;
   } catch (error: any) {
     console.error('Sign-in Error Details:', {
@@ -34,6 +43,10 @@ export const signInWithGoogle = async () => {
     }
     if (error.code === 'auth/unauthorized-domain') {
       alert(`Sign-in failed: This domain (${window.location.hostname}) is not authorized in your Firebase Console. Please add it to Authentication > Settings > Authorized Domains.`);
+      return;
+    }
+    if (error.code === 'auth/unauthorized-operator') {
+      alert(error.message);
       return;
     }
     

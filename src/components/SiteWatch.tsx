@@ -113,19 +113,7 @@ interface MonitoredSite {
 
 export const SiteWatch = () => {
   const { user, loading } = useAuth();
-  const isAdmin = React.useMemo(() => {
-    const adminUid = import.meta.env.VITE_ADMIN_UID;
-    const isMatched = user?.uid && user.uid === adminUid;
-    
-    if (user && !isMatched) {
-      console.warn('Operator Identification Failed:', {
-        currentUserUid: user.uid,
-        expectedAdminUid: adminUid,
-        status: adminUid ? 'Mismatch' : 'Missing VITE_ADMIN_UID in environment'
-      });
-    }
-    return isMatched;
-  }, [user]);
+  const isAdmin = user?.email === 'apatirasulayman@gmail.com';
   
   const [url, setUrl] = useState("");
   const [urlError, setUrlError] = useState<string | null>(null);
@@ -318,7 +306,7 @@ export const SiteWatch = () => {
 
   // Monitor sites from Firestore
   useEffect(() => {
-    if (!user) {
+    if (!user || !isAdmin) {
       setMonitoredSites([]);
       return;
     }
