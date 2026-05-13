@@ -18,6 +18,12 @@ export const signInWithGoogle = async () => {
     const result = await authPromise;
     return result;
   } catch (error: any) {
+    console.error('Sign-in Error Details:', {
+      code: error.code,
+      message: error.message,
+      domain: window.location.hostname
+    });
+
     if (error.code === 'auth/cancelled-popup-request') {
       console.warn('Authentication popup already open or cancelled.');
       return;
@@ -26,6 +32,12 @@ export const signInWithGoogle = async () => {
       console.warn('Authentication popup closed by user.');
       return;
     }
+    if (error.code === 'auth/unauthorized-domain') {
+      alert(`Sign-in failed: This domain (${window.location.hostname}) is not authorized in your Firebase Console. Please add it to Authentication > Settings > Authorized Domains.`);
+      return;
+    }
+    
+    alert(`Sign-In Protocol Error: ${error.message}`);
     throw error;
   } finally {
     authPromise = null;
