@@ -341,8 +341,11 @@ export const SiteWatch = () => {
           timestamp: Date.now()
         }
       });
+      alert(`Success: ${data.url} has been pinned for persistent monitoring.`);
       setIsSettingsOpen(false); 
+      setView('monitored');
     } catch (err) {
+      console.error('Save Site failed:', err);
       handleFirestoreError(err, OperationType.CREATE, path);
     } finally {
       setIsSaving(false);

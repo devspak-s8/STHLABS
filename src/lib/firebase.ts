@@ -88,6 +88,14 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
     operationType,
     path
   }
-  console.error('Firestore Error: ', JSON.stringify(errInfo));
+  console.error('Firestore Error Details:', errInfo);
+  
+  const displayError = error instanceof Error ? error.message : String(error);
+  if (displayError.toLowerCase().includes('permission-denied') || displayError.toLowerCase().includes('insufficient permissions')) {
+    alert(`Security Protocol Error: Access denied to path "${path}". Please verify your credentials and permissions.`);
+  } else {
+    alert(`Data Link Error: ${displayError}`);
+  }
+  
   throw new Error(JSON.stringify(errInfo));
 }
