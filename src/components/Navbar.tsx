@@ -9,7 +9,7 @@ const links = [
   { name: "Services", href: "#services" },
   { name: "Portfolio", href: "#work" },
   { name: "Pricing", href: "#pricing" },
-  { name: "Common Questions", href: "#faq" },
+  { name: "FAQ", href: "#faq" },
   { name: "Tools", href: "#tech" },
   { name: "Site Watch", href: "/site-watch" },
 ];
@@ -85,7 +85,7 @@ export const Navbar = () => {
       </Link>
       
       {/* Desktop Links */}
-      <div id="nav-links" className="hidden md:flex gap-6 lg:gap-8">
+      <div id="nav-links" className="hidden min-[1100px]:flex gap-6 lg:gap-8 absolute left-1/2 -translate-x-1/2">
         {navLinks.map((link) => (
           <a
             key={link.name}
@@ -93,7 +93,7 @@ export const Navbar = () => {
             onClick={(e) => handleNavClick(e, link.href)}
             onMouseEnter={() => setHoveredLink(link.name)}
             onMouseLeave={() => setHoveredLink(null)}
-            className="relative font-mono text-[10px] lg:text-xs tracking-tighter uppercase text-neutral-400 hover:text-accent transition-colors duration-200"
+            className="relative font-mono text-[10px] lg:text-[11px] tracking-widest uppercase text-neutral-400 hover:text-accent transition-colors duration-200"
           >
             {link.name}
             {hoveredLink === link.name && (
@@ -146,7 +146,7 @@ export const Navbar = () => {
 
         {/* Mobile Toggle */}
         <button 
-          className="md:hidden text-white p-2"
+          className="min-[1100px]:hidden text-white p-2"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -160,7 +160,7 @@ export const Navbar = () => {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="fixed left-0 right-0 top-[60px] md:top-[76px] bg-black border-t border-border z-[49] flex flex-col p-8 md:hidden shadow-2xl pb-12"
+            className="fixed left-0 right-0 top-[60px] md:top-[76px] bg-black border-t border-border z-[49] flex flex-col p-8 min-[1100px]:hidden shadow-2xl pb-12"
           >
             <div className="flex flex-col gap-6">
               {navLinks.map((link) => (
