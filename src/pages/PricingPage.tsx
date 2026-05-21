@@ -6,77 +6,77 @@ import { ArrowLeft, Check, Zap, Cpu, Shield, Activity, Database, GitBranch } fro
 const tiers = [
   {
     name: "Strategic Launchpad",
-    price: 1200,
+    price: 299,
     icon: <Cpu className="w-8 h-8 text-accent" />,
-    description: "A solid plan for your project's foundation and growth.",
-    longDescription: "Our Launchpad service is for founders who want to get things right from day one. We analyze your requirements to ensure your product is built for scale, security, and long-term success.",
+    description: "Get a clear step-by-step game plan, visual maps, and exact costs before you start building.",
+    longDescription: "Our Launchpad service helps you map out your entire app before writing any code. We outline everything simply and clearly so you know exactly how it will work, what it will cost, and the easiest way to launch it without costly mistakes.",
     modules: [
       {
-        title: "Product Roadmap",
-        desc: "A clear visual plan of your project's features, data flow, and third-party integrations.",
+        title: "Step-by-Step Game Plan",
+        desc: "A clear visual path showing exactly what features your app will have and how users will navigate through it.",
       },
       {
-        title: "Technology Strategy",
-        desc: "Selecting the best-fit database, language, and hosting providers for your specific needs.",
+        title: "Hosting & Tools Selector",
+        desc: "We help you pick the cheapest, fastest, and most reliable website hosts and database tools for your budget.",
       },
       {
-        title: "Security Planning",
-        desc: "Designing secure data handling and user authentication protocols to keep your business safe.",
+        title: "Safety & Security Outline",
+        desc: "A custom checklist to make sure your users' data stays safe and protected from unwanted access from day one.",
       },
       {
-        title: "Growth Strategy",
-        desc: "A phase-by-phase development plan with clear timelines and recommended resources.",
+        title: "Future Launch Guide",
+        desc: "A stage-by-stage guide showing clear construction timelines and simple setup steps to go live.",
       }
     ]
   },
   {
     name: "Product Accelerator",
-    price: 3500,
+    price: 899,
     icon: <Zap className="w-8 h-8 text-accent" />,
     popular: true,
-    description: "A complete, high-performance product built to grow.",
-    longDescription: "We build more than just MVPs. We build reliable, fast, and secure products that allow you to focus on growing your business without worrying about technical debt.",
+    description: "A complete, beautiful, and ready-to-use custom app or website built from the ground up.",
+    longDescription: "We build beautiful, fast, and secure web applications ready for your first customers. Instead of a messy draft, you get a premium, fully-coded product built to look stunning on computers and phones alike.",
     modules: [
       {
-        title: "Custom Development",
-        desc: "Full-scale building of your web application using modern, high-performance frameworks.",
+        title: "Custom Coding & Design",
+        desc: "Building and designing your entire website or web app from scratch, tailored perfectly to match your business look.",
       },
       {
-        title: "Feature Development",
-        desc: "Building out the core functionality your users need with clean, maintainable code.",
+        title: "User Accounts & Logins",
+        desc: "Setting up secure registration pages, profile layouts, and seamless member areas for your visitors.",
       },
       {
-        title: "Database Setup",
-        desc: "Designing and implementing a database that can handle your users and data reliably.",
+        title: "Safe Storage Database",
+        desc: "A clean, efficient database that securely saves your customer records, text, images, and other app information.",
       },
       {
-        title: "Automated Launch",
-        desc: "Setting up professional deployment pipelines for seamless, worry-free updates.",
+        title: "Automatic Update Pipeline",
+        desc: "Setting up professional launch systems that let you apply edits and update your site effortlessly with a single click.",
       }
     ]
   },
   {
     name: "Growth Engine",
-    price: 8500,
+    price: 1999,
     icon: <Shield className="w-8 h-8 text-accent" />,
-    description: "Enterprise software for complex business needs and high traffic.",
-    longDescription: "For growing teams and established companies. We build custom internal tools, complex integrations, and large-scale systems that turn fragmented processes into high-performance engines.",
+    description: "Advanced systems for teams, custom staff dashboards, and automatic time-saving tools.",
+    longDescription: "For growing teams and businesses with specific operations. We build custom staff control panels, link your systems together, and automate repetitive tasks to save your business hours of tedious admin work.",
     modules: [
       {
-        title: "Advanced Dashboards",
-        desc: "Custom internal software and management tools designed specifically for your team's workflow.",
+        title: "Custom Staff Control Panels",
+        desc: "A private, beautiful admin board for you and your staff to easily review user activity, view reports, and run the app.",
       },
       {
-        title: "System Integration",
-        desc: "Connecting your custom software with your current tools, ERPs, and external platforms.",
+        title: "Connecting Your Apps",
+        desc: "We hook your custom website directly into your current daily tools like Google Sheets, payment setups like Stripe, or CRMs.",
       },
       {
-        title: "Monitoring & Uptime",
-        desc: "Real-time alerts and professional oversight to ensure your systems never go dark.",
+        title: "Safety Audits & Backups",
+        desc: "Automatic daily backups and premium health checks to make sure your valuable files and business info are always safe.",
       },
       {
-        title: "Priority Partnership",
-        desc: "Direct access to our senior team for continuous improvement and high-priority requests.",
+        title: "Direct Creator Access",
+        desc: "Dedicated project help including a private Slack or WhatsApp chat directly with our creators for priority assistance.",
       }
     ]
   }

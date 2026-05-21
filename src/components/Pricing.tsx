@@ -26,59 +26,58 @@ const rates = {
 const tiers = [
   {
     name: "Strategic Launchpad",
-    price: 1200,
-    description: "Perfect for planning your project's foundation and long-term scaling strategy.",
-    features: ["Strategic Design Planning", "Technology Selection", "Security Review", "Growth Roadmap"],
+    price: 299,
+    description: "Get a clear step-by-step game plan, visual maps, and exact costs before you start building.",
+    features: ["Custom App Blueprint", "Cheap Hosting Setup", "Pre-Launch Safety Check", "Visual Map of Features"],
     details: [
-      "Strategy sessions with our lead designers",
-      "Comprehensive technical planning report",
-      "Optimal technology & stack selection",
-      "Database design & user flow mapping",
-      "Security best practices & compliance guide"
+      "Two 1-on-1 calls to talk about your idea and map it out",
+      "Easy-to-understand visual outline showing how your app will work",
+      "Choosing the safest, cheapest hosts and databases to save you money",
+      "A detailed checklist to make sure your website is safe from hackers",
+      "A step-by-step plan on how to release your app to the public"
     ]
   },
   {
     name: "Product Accelerator",
-    price: 3500,
-    description: "A complete, high-performance product built and ready for your first users.",
-    features: ["Custom App Development", "Reliable Backend", "Automated Updates", "Advanced Security"],
+    price: 899,
+    description: "A complete, beautiful, and ready-to-use custom app or website built from the ground up.",
+    features: ["Fully Built Custom Website", "User Logins & Profiles", "Secure Data Storage", "Works Great on Mobiles"],
     popular: true,
     details: [
-      "Everything in Strategic Launchpad + Full Build",
-      "Complete custom web application",
-      "Scalable backend infrastructure",
-      "Database setup and optimization",
-      "Automated deployment workflows",
-      "Performance testing and launch readiness"
+      "Everything in the Strategic Launchpad plan, plus a complete build",
+      "A fully coded, ready-to-launch web application built just for your brand",
+      "User login screens, profile pages, and account settings setup",
+      "A simple, secure database to store your users and app data",
+      "Fully tested on mobiles, tablets, and computers to look amazing everywhere",
+      "Fast page loading and search engine setup so Google can find your site easily"
     ]
   },
   {
     name: "Growth Engine",
-    price: 8500,
-    description: "Enterprise-grade software designed for complex teams and high-traffic needs.",
-    features: ["Custom Integrations", "Performance Optimization", "Workflow Automation", "Priority Support"],
+    price: 1999,
+    description: "Advanced systems for teams, custom staff dashboards, and automatic time-saving tools.",
+    features: ["Team Admin Dashboards", "Connect with Other Software", "Auto Daily Backups", "24/7 Help & Support"],
     details: [
-      "Everything in Product Accelerator + Scaling",
-      "Custom internal tools and employee dashboards",
-      "Advanced multi-user systems",
-      "Enterprise-level security audits",
-      "Third-party software integrations (ERP/CRM)",
-      "24/7 monitoring and auto-scaling support",
-      "Dedicated senior support team"
+      "Everything in the Product Accelerator plan, built for larger projects",
+      "Custom admin panels and tools for your employees to manage the app",
+      "Connecting your website with external tools like Google Sheets or Stripe payments",
+      "Automatic daily backups so you never lose your important business records",
+      "A direct group chat on Slack or WhatsApp for quick advice anytime",
+      "Emergency support to make sure your application never goes offline"
     ]
   },
   {
     name: "Custom Prototype",
     price: 0,
     isCustom: true,
-    description: "Tailored engineering for specific one-off research or pilot tools.",
-    features: ["One-off Scripts", "Research Prototypes", "Manual Integrations", "Fixed Scope Build"],
+    description: "Designed for highly specific problems, custom tools, or experimental pilot tests.",
+    features: ["Specific Script Automation", "Experimental Tech Tests", "Data Extraction Tools", "Tailored Coding Help"],
     details: [
-      "Highly specific experimental projects",
-      "Rapid hardware-software integrations",
-      "Legacy system data extraction scripts",
-      "Proof of concept for niche technologies",
-      "Short-term specialized engineering"
+      "Rapid software fixes made for very specific everyday problems",
+      "Custom scripts to safely extract and clean up data from old software",
+      "Connecting special smart hardware or scanners to your system",
+      "A quick trial build of a new feature to prove it works before investing",
+      "Short-term expert support to help solve complex computer puzzles"
     ]
   }
 ];
