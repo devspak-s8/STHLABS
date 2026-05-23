@@ -973,8 +973,8 @@ export const SiteWatch = () => {
                           <div className="text-[10px] font-bold tracking-tighter text-neutral-400">
                             {Math.floor(Math.random() * 500) + 100} KB
                           </div>
-                          <div className="h-4 w-full">
-                             <ResponsiveContainer width="100%" height="100%">
+                          <div className="h-4 w-full relative">
+                             <ResponsiveContainer width="100%" height={16}>
                                <AreaChart data={Array.from({length: 6}, () => ({v: Math.random()}))}>
                                  <Area type="basis" dataKey="v" stroke="#333" fill="#111" strokeWidth={1} />
                                </AreaChart>
@@ -988,8 +988,9 @@ export const SiteWatch = () => {
                   {/* Scatter Correlation */}
                   <div className="p-8 border border-white/10 bg-black/40 rounded-xl h-[350px]">
                     <h3 className="font-mono text-xs uppercase tracking-widest text-neutral-500 mb-8">Correlation: Density vs. Latency</h3>
-                    <ResponsiveContainer width="100%" height="90%">
-                      <ScatterChart>
+                    <div className="w-full h-[220px] relative">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <ScatterChart>
                         <XAxis type="number" dataKey="scripts" name="Scripts" hide />
                         <YAxis type="number" dataKey="styles" name="Styles" hide />
                         <ZAxis type="number" dataKey="images" range={[50, 400]} />
@@ -1005,6 +1006,7 @@ export const SiteWatch = () => {
                         />
                       </ScatterChart>
                     </ResponsiveContainer>
+                    </div>
                   </div>
                 </div>
 

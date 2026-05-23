@@ -1,13 +1,78 @@
 import { motion, AnimatePresence } from "motion/react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import { ChevronRight, ArrowUpRight, BarChart3, ShieldCheck, Zap } from "lucide-react";
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid } from "recharts";
 
 const works = [
   {
+    client: "AURA HORIZON",
+    category: "Web App Development",
+    title: "Hyper-personalized travel itinerary coordinator with multi-checkpoint booking models and customized offline portfolios.",
+    caseStudyId: 7,
+    stats: [
+      { label: "Checkpoints", value: "24+" },
+      { label: "Render Cost", value: "-55%" },
+      { label: "Guest Satisfaction", value: "99.7%" }
+    ],
+    challenges: "Seamlessly coordinating complex multi-checkpoint travel itineraries with zero network latency, alongside live on-the-ground validation of premium hospitality boutique assets, flight coordinates, and unpredictable air transit routes.",
+    solutions: "Engineered a real-time reactive itinerary coordinator utilizing state-dynamic relational calculations and high-fidelity local cache components, optimized with native IndexedDB buffers to maintain smooth performance.",
+    results: "Synchronized 24+ complex multi-destination flight vectors simultaneously under 100ms and reduced custom travel portfolio rendering times by 55% for premium agents.",
+    chartData: [
+      { time: 'Q1', value: 82 },
+      { time: 'Q2', value: 91 },
+      { time: 'Q3', value: 95 },
+      { time: 'Q4', value: 99 },
+    ],
+    accent: "#00FF90"
+  },
+  {
+    client: "AURELIA",
+    category: "Web App Development",
+    title: "Elite digital architectural showroom featuring real-time sliding-scale mortgage calculations and high-fidelity dropdowns.",
+    caseStudyId: 8,
+    stats: [
+      { label: "Estimate Accur.", value: "99.8%" },
+      { label: "Active Listings", value: "12+" },
+      { label: "User Stay Rate", value: "+60%" }
+    ],
+    challenges: "Building highly granular, real-time client-side mortgage estimators loaded with taxation metrics, nested inside an elite aesthetic with fluid transitions and flawless hover dynamics.",
+    solutions: "Developed modular mathematical components mapped directly to interactive slider actions, nested inside custom page transitions built using Hardware-Accelerated motion structures and custom coordinate maps.",
+    results: "Achieved a audited 99.8% mortgage accuracy across 12 estate properties and created 100% responsive fluid layout navigation across all displays, lifting stay session lengths by 60%.",
+    chartData: [
+      { time: 'Jan', value: 120 },
+      { time: 'Feb', value: 180 },
+      { time: 'Mar', value: 240 },
+      { time: 'Apr', value: 345 },
+    ],
+    accent: "#FF007F"
+  },
+  {
+    client: "FLEETFLOW",
+    category: "Backend Systems",
+    title: "Robust Logistics & Fleet Management Coordinator with Google Gemini route calculations and physical maintenance registers.",
+    caseStudyId: 9,
+    stats: [
+      { label: "Route Savings", value: "+22%" },
+      { label: "Telemetry Lat.", value: "<1.2s" },
+      { label: "Inspect. Checklists", value: "1,200+" }
+    ],
+    challenges: "Visualizing high-frequency real-time telemetry (driver coordinates, speed gauges, battery percentage drops) from active haulers while calling Google Gemini AI for fluid routing under heavy operational loads.",
+    solutions: "Created a fully responsive interactive telemetry map widget backed by secure buffer states, incorporating custom driver dispatch panels and physical registers for scheduling and tracking brake or oil repairs.",
+    results: "Boosted fleet routing efficiency by 22% using custom AI pathways and successfully cataloged 1,200+ detailed mechanic service inspections with zero missing inputs.",
+    chartData: [
+      { time: 'Wk-1', value: 72 },
+      { time: 'Wk-2', value: 78 },
+      { time: 'Wk-3', value: 85 },
+      { time: 'Wk-4', value: 94 },
+    ],
+    accent: "#E2FE30"
+  },
+  {
     client: "NeuroSync",
     category: "distributed systems",
     title: "High-frequency biometric data processing engine handling 100k+ ops/sec.",
+    caseStudyId: 1,
     stats: [
       { label: "Throughput", value: "120k/s" },
       { label: "Avg Latency", value: "0.8ms" },
@@ -31,6 +96,7 @@ const works = [
     client: "Arch-V",
     category: "fintech infrastructure",
     title: "Secure transaction validation layer for multi-chain asset management.",
+    caseStudyId: 2,
     stats: [
       { label: "Asset Volume", value: "$500M+" },
       { label: "Chains", value: "12+" },
@@ -51,6 +117,7 @@ const works = [
     client: "SolarIQ",
     category: "industrial iot",
     title: "Real-time energy grid optimization and monitoring dashboard for smart cities.",
+    caseStudyId: 3,
     stats: [
       { label: "Sensors", value: "450k" },
       { label: "Efficiency", value: "+15%" },
@@ -71,7 +138,7 @@ const works = [
 ];
 
 const logos = [
-  "NEURO", "ARCH-V", "SOLARIQ", "VECTOR", "CRYPTOX", "LUMINA", "SYNAPSE", "ORBITAL"
+  "NEURO", "ARCH-V", "SOLARIQ", "AURA", "AURELIA", "FLEETFLOW", "VECTOR", "CRYPTOX", "LUMINA", "SYNAPSE", "ORBITAL"
 ];
 
 export const SelectedWork = () => {
@@ -211,9 +278,12 @@ export const SelectedWork = () => {
                           </div>
                         </div>
 
-                        <button className="flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-accent hover:text-white transition-colors group">
+                        <Link 
+                          to={`/case-study/${work.caseStudyId}`}
+                          className="inline-flex items-center gap-3 font-mono text-[10px] uppercase tracking-[0.2em] text-accent hover:text-white transition-colors group"
+                        >
                           View Full Documentation <ArrowUpRight size={14} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-                        </button>
+                        </Link>
                       </div>
 
                       {/* Right Side: Visualization */}
@@ -226,7 +296,7 @@ export const SelectedWork = () => {
                           </div>
                         </div>
                         
-                        <div className="flex-grow">
+                        <div className="flex-grow h-[240px] w-full relative min-h-0 min-w-0">
                           <ResponsiveContainer width="100%" height="100%">
                             <AreaChart data={work.chartData}>
                               <defs>

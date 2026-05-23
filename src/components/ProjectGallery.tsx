@@ -17,6 +17,33 @@ interface Project {
 
 const projects: Project[] = [
   {
+    id: 7,
+    client: "AURA HORIZON",
+    logo: "AH",
+    title: "Aura Horizon — Premium Travel & Adventures",
+    description: "Hyper-personalized itinerary coordinator designed for elite travel agents. Relies on synchronized offline-first portfolios, multi-vector flight charts, on-the-ground suite verification checkups, and luxury flight coordinate pathways.",
+    categories: ["Web App Development"],
+    tags: ["React", "Motion", "TailwindCSS", "IndexedDB"]
+  },
+  {
+    id: 8,
+    client: "AURELIA",
+    logo: "AR",
+    title: "Aurelia Real Estate Platform",
+    description: "Immersive architectural showroom for premium estates featuring a real-time sliding-scale mortgage and tax calculator, horizontal fluid layout transitions, custom dashed borders, and exquisite dark theme dropdown filters.",
+    categories: ["Web App Development"],
+    tags: ["React", "Motion", "Calculations", "Financial APIs"]
+  },
+  {
+    id: 9,
+    client: "FLEETFLOW",
+    logo: "FF",
+    title: "Unified Logistics & Fleet Management Hub",
+    description: "Enterprise-grade fleet dispatching hub featuring Live Tracking Maps, fuel routing algorithms integrated with Google Gemini models, real-time battery and speed telemetry gauges, and meticulous physical service log checklists.",
+    categories: ["Backend Systems", "Automation"],
+    tags: ["Node.js", "Gemini AI", "WebSockets", "D3.js"]
+  },
+  {
     id: 1,
     client: "VELOCITY",
     logo: "V",
