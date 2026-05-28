@@ -192,22 +192,42 @@ export const SelectedWork = () => {
             {/* Header Content */}
             <div 
               onClick={() => setExpandedIndex(expandedIndex === i ? null : i)}
-              className="flex flex-col md:flex-row md:items-center justify-between p-6 md:p-10 cursor-pointer"
+              className="flex flex-col lg:flex-row lg:items-center justify-between p-6 md:p-10 cursor-pointer gap-6"
             >
-              <div className="max-w-2xl">
-                <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-4">
-                  <span className="font-mono text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-accent">{work.client}</span>
-                  <span className="hidden md:block w-1 h-1 bg-neutral-700 rounded-full" />
-                  <span className="font-mono text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-neutral-500">{work.category}</span>
+              <div className="flex flex-col md:flex-row md:items-center gap-6 flex-1 min-w-0">
+                {/* Deployment Picture Thumbnail */}
+                <div className="w-full md:w-48 h-32 md:h-24 overflow-hidden border border-white/10 bg-neutral-900 flex-shrink-0 relative">
+                  <img 
+                    src={
+                      work.caseStudyId === 7 ? "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop" :
+                      work.caseStudyId === 8 ? "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop" :
+                      work.caseStudyId === 9 ? "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2070&auto=format&fit=crop" :
+                      work.caseStudyId === 1 ? "https://images.unsplash.com/photo-1611974714851-eb6077e69b05?q=80&w=2070&auto=format&fit=crop" :
+                      work.caseStudyId === 2 ? "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070&auto=format&fit=crop" :
+                      "https://images.unsplash.com/photo-1621761191319-c6fb62004040?q=80&w=2070&auto=format&fit=crop"
+                    } 
+                    alt={`${work.client} Deployment Preview`}
+                    referrerPolicy="no-referrer"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent pointer-events-none" />
                 </div>
-                <h3 className={`font-sans text-lg md:text-2xl font-medium transition-colors leading-relaxed ${
-                  expandedIndex === i ? "text-white" : "text-neutral-400 group-hover:text-neutral-200"
-                }`}>
-                  {work.title}
-                </h3>
+
+                <div className="flex-grow min-w-0">
+                  <div className="flex flex-wrap items-center gap-2 md:gap-4 mb-4">
+                    <span className="font-mono text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-accent">{work.client}</span>
+                    <span className="hidden md:block w-1 h-1 bg-neutral-700 rounded-full" />
+                    <span className="font-mono text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-neutral-500">{work.category}</span>
+                  </div>
+                  <h3 className={`font-sans text-base md:text-xl font-medium transition-colors leading-relaxed ${
+                    expandedIndex === i ? "text-white" : "text-neutral-400 group-hover:text-neutral-200"
+                  }`}>
+                    {work.title}
+                  </h3>
+                </div>
               </div>
               
-              <div className="mt-8 md:mt-0 flex items-center gap-4">
+              <div className="mt-4 lg:mt-0 flex items-center justify-between lg:justify-end gap-6 w-full lg:w-auto shrink-0 border-t lg:border-t-0 border-white/5 pt-4 lg:pt-0">
                 <div className={`hidden md:flex gap-8 mr-8 transition-opacity duration-300 ${expandedIndex === i ? "opacity-0" : "opacity-100"}`}>
                   {work.stats.slice(0, 2).map((stat, idx) => (
                     <div key={idx} className="text-right">

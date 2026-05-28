@@ -25,6 +25,20 @@ const rates = {
 
 const tiers = [
   {
+    name: "Software Solutions Consultation",
+    price: 10,
+    priceMax: 100,
+    isConsultationFee: true,
+    description: "Expert tactical consultation on software architecture, troubleshooting, and project planning.",
+    features: ["1-on-1 Architect Session", "Urgent Priority Option", "WhatsApp Direct Channel", "Actionable Solution Guide"],
+    details: [
+      "Custom software planning and tech stack recommendations",
+      "Immediate system troubleshooting or bug containment advice",
+      "Urgent response priority options available directly from $10 to $100",
+      "Get a clear system map and next steps outline to execute yourself"
+    ]
+  },
+  {
     name: "Strategic Launchpad",
     price: 299,
     description: "Get a clear step-by-step game plan, visual maps, and exact costs before you start building.",
@@ -119,9 +133,7 @@ export const Pricing = ({ onSelectTier }: PricingProps) => {
               <button
                 key={curr}
                 onClick={() => setCurrency(curr)}
-                className={`flex-1 md:flex-none px-4 py-2 md:px-3 md:py-1 font-mono text-[10px] uppercase tracking-widest transition-colors ${
-                  currency === curr ? "bg-white text-black" : "text-neutral-500 hover:text-white"
-                }`}
+                className="flex-1 md:flex-none px-4 py-2 md:px-3 md:py-1 font-mono text-[10px] uppercase tracking-widest transition-colors"
               >
                 {curr}
               </button>
@@ -130,7 +142,7 @@ export const Pricing = ({ onSelectTier }: PricingProps) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
         {tiers.map((tier, i) => (
           <motion.div
             key={tier.name}
@@ -141,13 +153,25 @@ export const Pricing = ({ onSelectTier }: PricingProps) => {
             className={`flex flex-col p-6 md:p-8 border ${tier.popular ? 'border-accent ring-1 ring-accent' : 'border-border'} bg-surface/30`}
           >
             <div className="mb-6 md:mb-8">
-              <h3 className="font-sans text-lg md:text-xl font-medium text-white mb-2">{tier.name}</h3>
+              <h3 className="font-sans text-lg md:text-xl font-medium text-white mb-2 leading-snug">{tier.name}</h3>
               <p className="font-sans text-xs md:text-sm text-neutral-400 h-12 line-clamp-3 md:line-clamp-2">{tier.description}</p>
             </div>
             
             <div className="mb-8">
-              <div className="text-2xl md:text-3xl font-sans font-semibold text-white tracking-tight flex items-baseline gap-1">
+              <div className="text-xl md:text-2xl font-sans font-semibold text-white tracking-tight flex items-baseline gap-1">
                 {(() => {
+                  if (tier.isConsultationFee && tier.priceMax) {
+                    const symbol = currency === "NGN" ? "₦" : currency === "EUR" ? "€" : "$";
+                    const minVal = tier.price * rates[currency];
+                    const maxVal = tier.priceMax * rates[currency];
+                    return (
+                      <span className="text-lg md:text-xl font-bold font-sans text-white">
+                        <span className="text-accent/50 text-sm">{symbol}</span>
+                        {Math.round(minVal).toLocaleString()} - <span className="text-accent/50 text-sm">{symbol}</span>
+                        {Math.round(maxVal).toLocaleString()}
+                      </span>
+                    );
+                  }
                   const { prefix, value, suffix } = getPriceComponents(tier.price, tier.isCustom);
                   if (value === null) return <span>{suffix}</span>;
                   return (
@@ -158,7 +182,9 @@ export const Pricing = ({ onSelectTier }: PricingProps) => {
                   );
                 })()}
               </div>
-              <div className="font-mono text-[9px] md:text-[10px] text-neutral-500 uppercase mt-1">Starting deployment</div>
+              <div className="font-mono text-[9px] md:text-[10px] text-neutral-500 uppercase mt-1">
+                {tier.isConsultationFee ? "consultation rate scale" : "Starting deployment"}
+              </div>
             </div>
 
             <div className="mb-4 font-mono text-[10px] text-accent uppercase tracking-widest">

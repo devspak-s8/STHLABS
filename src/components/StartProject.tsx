@@ -15,6 +15,7 @@ type BookingStep = 'brief' | 'scheduling' | 'details' | 'transmitting' | 'succes
 
 export const StartProject = ({ selectedTier }: StartProjectProps) => {
   const [step, setStep] = useState<BookingStep>("brief");
+  const [isUrgent, setIsUrgent] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [formData, setFormData] = useState({
@@ -29,6 +30,20 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
   const [discountApplied, setDiscountApplied] = useState(false);
   const [discountError, setDiscountError] = useState(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+
+  const getBasePrice = () => {
+    if (!selectedTier) return 0;
+    if (selectedTier === "Software Solutions Consultation") {
+      return isUrgent ? 100 : 10;
+    }
+    if (selectedTier === "Strategic Launchpad") return 299;
+    if (selectedTier === "Product Accelerator") return 899;
+    if (selectedTier === "Growth Engine") return 1999;
+    return 0; // Custom or Prototype
+  };
+
+  const basePrice = getBasePrice();
+  const finalPrice = discountApplied ? Math.round(basePrice * 0.7) : basePrice;
 
   const handleApplyDiscount = () => {
     if (discountCode === "QUETTRIXLABS") {
@@ -117,6 +132,8 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
           email: formData.email,
           message: formData.message,
           tier: selectedTier,
+          isUrgent: selectedTier === "Software Solutions Consultation" ? isUrgent : false,
+          price: finalPrice,
           schedule: {
             date: format(bookingDetails.date, "yyyy-MM-dd"),
             time: bookingDetails.time,
@@ -192,7 +209,9 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
               <form onSubmit={handleInitialSubmit} className="space-y-12">
                 <div className="space-y-6">
                   <div className="flex justify-between items-center">
-                    <label className="block font-mono text-[10px] uppercase tracking-widest text-neutral-500">Project Schematics</label>
+                    <label className="block font-mono text-[10px] uppercase tracking-widest text-neutral-500">
+                      {selectedTier === "Software Solutions Consultation" ? "Consultation Focus & Objectives" : "Project Schematics"}
+                    </label>
                     {isGeneratingSuggestions && (
                       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex items-center gap-2">
                         <Loader2 size={10} className="animate-spin text-accent" />
@@ -202,12 +221,50 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
                   </div>
                   <textarea 
                     required
-                    placeholder="Provide a detailed breakdown of your requirements, tech preferences, and timeline goals..." 
+                    placeholder={selectedTier === "Software Solutions Consultation" 
+                      ? "Provide details on the software solutions, code troubleshooting, or database/infrastructure planning challenges you'd like us to focus on..." 
+                      : "Provide a detailed breakdown of your requirements, tech preferences, and timeline goals..."
+                    } 
                     rows={6} 
                     value={formData.message}
                     onChange={(e) => setFormData({...formData, message: e.target.value})}
                     className="w-full bg-surface/20 border border-white/5 p-6 font-sans text-white text-lg focus:outline-none focus:border-accent/40 transition-colors resize-none placeholder:text-neutral-800 leading-relaxed" 
                   />
+                  
+                  {selectedTier === "Software Solutions Consultation" && (
+                    <div className="p-6 border border-white/10 bg-white/[0.02] rounded-xl space-y-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                          <h4 className="font-sans font-semibold text-sm text-white">Consultation Urgency Level</h4>
+                          <p className="font-sans text-[11px] text-neutral-500">Choose response priority speed</p>
+                        </div>
+                        <div className="flex gap-2 bg-black border border-white/10 p-1 rounded">
+                          <button
+                            type="button"
+                            onClick={() => setIsUrgent(false)}
+                            className={`px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest transition-colors ${!isUrgent ? 'bg-accent text-black font-semibold' : 'text-neutral-500 hover:text-white'}`}
+                          >
+                            Standard ($10)
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setIsUrgent(true)}
+                            className={`px-3 py-1.5 font-mono text-[9px] uppercase tracking-widest transition-colors ${isUrgent ? 'bg-red-600 text-white font-semibold' : 'text-neutral-500 hover:text-white'}`}
+                          >
+                            Urgent ($100)
+                          </button>
+                        </div>
+                      </div>
+                      
+                      <div className="text-[10px] font-mono text-neutral-400 bg-white/5 p-3 rounded border border-white/5">
+                        {isUrgent ? (
+                          <span className="text-red-400">🔥 URGENT PRIORITY ACTIVE: Direct page sent to senior architect on booking. Call initialized within 5-10 minutes. Includes priority WhatsApp follow-ups.</span>
+                        ) : (
+                          <span className="text-emerald-400">📅 STANDARD PRIORITY ACTIVE: Standard sync cycle active. Review queue duration typically within 20 minutes.</span>
+                        )}
+                      </div>
+                    </div>
+                  )}
                   
                   <AnimatePresence>
                     {suggestions.length > 0 && (
@@ -417,6 +474,27 @@ export const StartProject = ({ selectedTier }: StartProjectProps) => {
                   </p>
                 </div>
               </div>
+              
+              {selectedTier === "Software Solutions Consultation" && (
+                <div className="mb-16 p-8 border border-green-500/30 bg-green-500/[0.03] space-y-4 max-w-2xl mx-auto rounded-lg text-left">
+                  <div className="flex items-center gap-2 text-green-400">
+                    <span className="w-2 h-2 rounded-full bg-green-400 animate-ping" />
+                    <span className="font-mono text-xs uppercase tracking-widest font-bold">Secure WhatsApp Integration Hotlink</span>
+                  </div>
+                  <h4 className="font-sans text-xl font-medium text-white">Instant Software Consultation Handshake Activated</h4>
+                  <p className="font-sans text-xs text-neutral-400 leading-relaxed">
+                    Double-secure your consultation block immediately by establishing direct connection with our lead architect. Click below to auto-prepare your details and transmit them straight to the active terminal.
+                  </p>
+                  <a 
+                    href={`https://wa.me/2349037063075?text=Hi%20Quettrix%20Labs!%20My%20name%20is%20${encodeURIComponent(formData.name)}.%20I%20just%20booked%20a%20Software%20Solutions%20Consultation%20(${isUrgent ? 'Urgent%20Priority' : 'Standard%20Sync'})%20for%20${encodeURIComponent(bookingDetails ? format(bookingDetails.date, "EEEE, MMMM do") + " at " + bookingDetails.time + " (" + bookingDetails.timezone + ")" : "")}.%20Email%3A%20${encodeURIComponent(formData.email)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-3 bg-[#25D366] text-black hover:bg-white transition-all font-mono text-[11px] font-bold uppercase tracking-[0.2em] px-8 py-4 w-full text-center rounded"
+                  >
+                    Send Confirmation & Join Chat via WhatsApp
+                  </a>
+                </div>
+              )}
 
               <button 
                 onClick={() => setStep("brief")}

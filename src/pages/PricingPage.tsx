@@ -5,6 +5,32 @@ import { ArrowLeft, Check, Zap, Cpu, Shield, Activity, Database, GitBranch } fro
 
 const tiers = [
   {
+    name: "Software Solutions Consultation",
+    price: 10,
+    priceText: "$10 - $100",
+    icon: <Activity className="w-8 h-8 text-accent" />,
+    description: "Expert tactical consultation on software architecture, troubleshooting, and project planning.",
+    longDescription: "Our custom software architecture and solution consultations let you speak 1-on-1 with senior systems architects to solve precise blockers, audit codes, and formulate precise steps. Rates are kept affordable, scaling dynamically from $10 for a standard sync block up to $100 for immediate, high-urgency priority overrides.",
+    modules: [
+      {
+        title: "Architectural & Layout Consult",
+        desc: "Interactive whiteboarding and technical plan mapping covering databases, custom logic steps, and frameworks.",
+      },
+      {
+        title: "Dynamic Time Slots Selection",
+        desc: "Coordinate and book the exact kickoff block that fits your schedule, automatically translated to your local timezone.",
+      },
+      {
+        title: "Urgent Priority Toggle",
+        desc: "Upgrade to express priority scheduling to notify our lead engineers instantly on WhatsApp.",
+      },
+      {
+        title: "Integrated WhatsApp Routing",
+        desc: "Generates custom connection channels to our direct desk so you can keep in touch with builders immediately.",
+      }
+    ]
+  },
+  {
     name: "Strategic Launchpad",
     price: 299,
     icon: <Cpu className="w-8 h-8 text-accent" />,
@@ -132,7 +158,9 @@ export const PricingPage = () => {
               <div className="lg:w-1/3">
                 <div className="mb-8">{tier.icon}</div>
                 <h2 className="text-3xl font-sans font-bold text-white mb-4 uppercase">{tier.name}</h2>
-                <div className="text-4xl font-sans font-bold text-white mb-6">${tier.price.toLocaleString()}</div>
+                <div className="text-4xl font-sans font-bold text-white mb-6">
+                  {tier.priceText ? tier.priceText : `$${tier.price.toLocaleString()}`}
+                </div>
                 <p className="text-neutral-400 font-sans leading-relaxed mb-8">
                   {tier.longDescription}
                 </p>
