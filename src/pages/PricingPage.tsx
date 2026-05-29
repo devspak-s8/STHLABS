@@ -5,37 +5,13 @@ import { ArrowLeft, Check, Zap, Cpu, Shield, Activity, Database, GitBranch } fro
 
 const tiers = [
   {
-    name: "Software Solutions Consultation",
-    price: 10,
-    priceText: "$10 - $100",
-    icon: <Activity className="w-8 h-8 text-accent" />,
-    description: "Expert tactical consultation on software architecture, troubleshooting, and project planning.",
-    longDescription: "Our custom software architecture and solution consultations let you speak 1-on-1 with senior systems architects to solve precise blockers, audit codes, and formulate precise steps. Rates are kept affordable, scaling dynamically from $10 for a standard sync block up to $100 for immediate, high-urgency priority overrides.",
-    modules: [
-      {
-        title: "Architectural & Layout Consult",
-        desc: "Interactive whiteboarding and technical plan mapping covering databases, custom logic steps, and frameworks.",
-      },
-      {
-        title: "Dynamic Time Slots Selection",
-        desc: "Coordinate and book the exact kickoff block that fits your schedule, automatically translated to your local timezone.",
-      },
-      {
-        title: "Urgent Priority Toggle",
-        desc: "Upgrade to express priority scheduling to notify our lead engineers instantly on WhatsApp.",
-      },
-      {
-        title: "Integrated WhatsApp Routing",
-        desc: "Generates custom connection channels to our direct desk so you can keep in touch with builders immediately.",
-      }
-    ]
-  },
-  {
     name: "Strategic Launchpad",
     price: 299,
     icon: <Cpu className="w-8 h-8 text-accent" />,
     description: "Get a clear step-by-step game plan, visual maps, and exact costs before you start building.",
     longDescription: "Our Launchpad service helps you map out your entire app before writing any code. We outline everything simply and clearly so you know exactly how it will work, what it will cost, and the easiest way to launch it without costly mistakes.",
+    perfectFor: "Validating software features, hosting choice optimization, and system schema blueprints.",
+    delivered: "Detailed UI/UX flowchart blueprints, hosting budget cost setup, and a full hacking safety outline.",
     modules: [
       {
         title: "Step-by-Step Game Plan",
@@ -62,6 +38,8 @@ const tiers = [
     popular: true,
     description: "A complete, beautiful, and ready-to-use custom app or website built from the ground up.",
     longDescription: "We build beautiful, fast, and secure web applications ready for your first customers. Instead of a messy draft, you get a premium, fully-coded product built to look stunning on computers and phones alike.",
+    perfectFor: "Premium Landing Pages, E-commerce Stores, Company Portals Corporate Sites, or SaaS Product MVPs.",
+    delivered: "Fully coded custom web build, secure signup/login workflows, database sync setup, and 6 Months Technical Support.",
     modules: [
       {
         title: "Custom Coding & Design",
@@ -85,8 +63,10 @@ const tiers = [
     name: "Growth Engine",
     price: 1999,
     icon: <Shield className="w-8 h-8 text-accent" />,
-    description: "Advanced systems for teams, custom staff dashboards, and automatic time-saving tools.",
+    description: "Advanced systems for teams, custom staff dashboards, and automatic daily sync backups.",
     longDescription: "For growing teams and businesses with specific operations. We build custom staff control panels, link your systems together, and automate repetitive tasks to save your business hours of tedious admin work.",
+    perfectFor: "Internal Staff dashboards, Complex Customer platforms, dynamic ERP portals, or automated SaaS clusters.",
+    delivered: "Custom role-based admin dashboard, Stripe/Calendar/CRM APIs integration, auto weekly backups, and premium uptime tuning.",
     modules: [
       {
         title: "Custom Staff Control Panels",
@@ -103,6 +83,34 @@ const tiers = [
       {
         title: "Direct Creator Access",
         desc: "Dedicated project help including a private Slack or WhatsApp chat directly with our creators for priority assistance.",
+      }
+    ]
+  },
+  {
+    name: "Software Solutions Consultation",
+    price: 10,
+    priceText: "$10 - $100",
+    icon: <Activity className="w-8 h-8 text-accent" />,
+    description: "Expert tactical consultation on software architecture, troubleshooting, and project planning.",
+    longDescription: "Our custom software architecture and solution consultations let you speak 1-on-1 with senior systems architects to solve precise blockers, audit codes, and formulate precise steps. Rates are kept affordable, scaling dynamically from $10 for a standard sync block up to $100 for immediate, high-urgency priority overrides.",
+    perfectFor: "Custom database advice, system architecture planning, debugging code blocks or troubleshooting complex server bugs.",
+    delivered: "Interactive design whiteboards, clear roadmap diagram, and direct WhatsApp sync channels.",
+    modules: [
+      {
+        title: "Architectural & Layout Consult",
+        desc: "Interactive whiteboarding and technical plan mapping covering databases, custom logic steps, and frameworks.",
+      },
+      {
+        title: "Dynamic Time Slots Selection",
+        desc: "Coordinate and book the exact kickoff block that fits your schedule, automatically translated to your local timezone.",
+      },
+      {
+        title: "Urgent Priority Toggle",
+        desc: "Upgrade to express priority scheduling to notify our lead engineers instantly on WhatsApp.",
+      },
+      {
+        title: "Integrated WhatsApp Routing",
+        desc: "Generates custom connection channels to our direct desk so you can keep in touch with builders immediately.",
       }
     ]
   }
@@ -155,18 +163,38 @@ export const PricingPage = () => {
                 </div>
               )}
 
-              <div className="lg:w-1/3">
-                <div className="mb-8">{tier.icon}</div>
-                <h2 className="text-3xl font-sans font-bold text-white mb-4 uppercase">{tier.name}</h2>
-                <div className="text-4xl font-sans font-bold text-white mb-6">
-                  {tier.priceText ? tier.priceText : `$${tier.price.toLocaleString()}`}
+              <div className="lg:w-1/3 flex flex-col justify-between">
+                <div>
+                  <div className="mb-8">{tier.icon}</div>
+                  <h2 className="text-3xl font-sans font-bold text-white mb-4 uppercase">{tier.name}</h2>
+                  <div className="text-4xl font-sans font-bold text-white mb-6">
+                    {tier.priceText ? tier.priceText : `$${tier.price.toLocaleString()}`}
+                  </div>
+                  <p className="text-neutral-400 font-sans leading-relaxed mb-6">
+                    {tier.longDescription}
+                  </p>
+
+                  <div className="border-t border-b border-white/10 py-4 mb-8 space-y-4">
+                    <div>
+                      <span className="font-mono text-[9px] uppercase tracking-wider text-accent block mb-1">Target Scope / Site Types</span>
+                      <p className="text-xs text-neutral-300 leading-relaxed">{tier.perfectFor}</p>
+                    </div>
+                    <div>
+                      <span className="font-mono text-[9px] uppercase tracking-wider text-neutral-500 block mb-1">Standard Deliverables</span>
+                      <p className="text-xs text-neutral-400 leading-relaxed">{tier.delivered}</p>
+                    </div>
+                    {tier.name !== "Software Solutions Consultation" && (
+                      <div className="text-[11px] font-mono text-emerald-400 flex items-center gap-1.5 pt-1">
+                        <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse shrink-0" />
+                        6 Months Free Maintenance Included
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <p className="text-neutral-400 font-sans leading-relaxed mb-8">
-                  {tier.longDescription}
-                </p>
+
                 <button 
                   onClick={() => navigate(`/?tier=${encodeURIComponent(tier.name)}#start-project`)}
-                  className="w-full bg-white text-black py-4 font-mono text-xs font-bold uppercase tracking-widest hover:bg-accent transition-colors"
+                  className="w-full bg-white text-black py-4 font-mono text-xs font-bold uppercase tracking-widest hover:bg-accent transition-colors mt-auto"
                 >
                   Book This Project
                 </button>

@@ -64,16 +64,20 @@ const projects = [
   },
   {
     id: 1,
-    client: "VELOCITY",
-    title: "Next-Gen Fintech Dashboard",
-    description: "High-performance financial visualization tool with sub-second data propagation and modular widget architecture.",
-    longDescription: "Velocity required a platform capable of handling millions of concurrent data streams with zero perceptible latency. Our solution focused on a Rust-based backend for raw computation speed and a highly optimized React frontend using specialized canvas rendering for complex charts.",
-    challenge: "The primary obstacle was the 'browser bottleneck'—rendering tens of thousands of data points every 100ms without dropping frames or freezing the UI.",
-    solution: "We implemented a custom worker-threaded processing layer that offloads data crunching from the main thread, combined with a bespoke WebGL-based visualization engine.",
-    results: ["99.9th percentile latency under 50ms", "Supported 100k+ concurrent ticker updates", "Redesigned institutional user retention increased by 42%"],
-    categories: ["Web App Development", "Backend Systems"],
-    tags: ["React", "Rust", "WebSockets"],
-    heroImage: "https://images.unsplash.com/photo-1611974714851-eb6077e69b05?q=80&w=2070&auto=format&fit=crop"
+    client: "NeuroSync",
+    title: "NeuroSync — Biometric Streaming Engine",
+    description: "High-frequency biometric data processing engine handling 100k+ ops/sec.",
+    longDescription: "NeuroSync required a platform capable of handling millions of concurrent data streams from medical-grade wearables with zero perceptible latency. Our solution focused on a Rust-based backend for raw computation speed and a highly optimized stream message queue to bypass traditional processing overheads, keeping synchronization swift.",
+    challenge: "Handling extreme data velocity from millions of medical-grade wearable devices while maintaining sub-millisecond consistency for critical health alerts.",
+    solution: "We implemented a custom distributed stream processing engine using Rust-based workers and highly optimized message queuing, completely bypassing traditional HTTP bottlenecks.",
+    results: [
+      "Achieved sub-millisecond latency (sub 0.8ms average) of high-frequency pulses",
+      "Sustained 99.999% processing uptime during extreme wearable telemetry surges",
+      "Successfully scaled to 120,000 operations per second under peak testing configurations"
+    ],
+    categories: ["Distributed Systems", "Backend Architecture"],
+    tags: ["Rust", "WebSockets", "Biometrics"],
+    heroImage: "https://images.unsplash.com/photo-1507668077129-56e32842fceb?q=80&w=2070&auto=format&fit=crop"
   },
   {
     id: 2,

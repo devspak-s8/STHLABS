@@ -202,7 +202,7 @@ export const SelectedWork = () => {
                       work.caseStudyId === 7 ? "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop" :
                       work.caseStudyId === 8 ? "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070&auto=format&fit=crop" :
                       work.caseStudyId === 9 ? "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?q=80&w=2070&auto=format&fit=crop" :
-                      work.caseStudyId === 1 ? "https://images.unsplash.com/photo-1611974714851-eb6077e69b05?q=80&w=2070&auto=format&fit=crop" :
+                      work.caseStudyId === 1 ? "https://images.unsplash.com/photo-1507668077129-56e32842fceb?q=80&w=2070&auto=format&fit=crop" :
                       work.caseStudyId === 2 ? "https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=2070&auto=format&fit=crop" :
                       "https://images.unsplash.com/photo-1621761191319-c6fb62004040?q=80&w=2070&auto=format&fit=crop"
                     } 
