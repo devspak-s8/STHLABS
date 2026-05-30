@@ -10,6 +10,7 @@ import { Philosophy } from "../components/Philosophy";
 import { FAQ } from "../components/FAQ";
 import { StartProject } from "../components/StartProject";
 import { FinalCTA } from "../components/FinalCTA";
+import { BreakingBanner } from "../components/BreakingBanner";
 import { motion, useScroll, useSpring } from "motion/react";
 
 interface HomePageProps {
@@ -33,6 +34,7 @@ export const HomePage = ({ selectedTier, setSelectedTier }: HomePageProps) => {
       />
       
       <main className="max-w-7xl mx-auto border-x border-border bg-background shadow-[0_0_100px_rgba(0,0,0,0.5)]">
+        <BreakingBanner />
         <Hero />
         
         <motion.div

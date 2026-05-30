@@ -12,6 +12,7 @@ import { HomePage } from "./pages/HomePage";
 import { PricingPage } from "./pages/PricingPage";
 import { SiteWatch } from "./components/SiteWatch";
 import { CaseStudyPage } from "./components/CaseStudyPage";
+import { SmeInitiativeModal } from "./components/SmeInitiativeModal";
 import { useState, useEffect } from "react";
 import { Analytics } from "@vercel/analytics/react";
 import { WifiOff, AlertTriangle } from "lucide-react";
@@ -21,6 +22,7 @@ function AppContent() {
   const [selectedTier, setSelectedTier] = useState<string | null>(null);
   const [searchParams] = useSearchParams();
   const [isOffline, setIsOffline] = useState(!navigator.onLine);
+  const [isSmeOpen, setIsSmeOpen] = useState(false);
 
   useEffect(() => {
     const handleOnline = () => setIsOffline(false);
@@ -32,6 +34,14 @@ function AppContent() {
     return () => {
       window.removeEventListener("online", handleOnline);
       window.removeEventListener("offline", handleOffline);
+    };
+  }, []);
+
+  useEffect(() => {
+    const openSmeHandler = () => setIsSmeOpen(true);
+    window.addEventListener("open-sme-modal", openSmeHandler);
+    return () => {
+      window.removeEventListener("open-sme-modal", openSmeHandler);
     };
   }, []);
 
@@ -73,6 +83,8 @@ function AppContent() {
         <Route path="/case-study/:id" element={<CaseStudyPage />} />
       </Routes>
       
+      <SmeInitiativeModal isOpen={isSmeOpen} onClose={() => setIsSmeOpen(false)} />
+
       <Footer />
       <Analytics />
     </div>

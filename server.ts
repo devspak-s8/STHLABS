@@ -5,6 +5,7 @@ import { fileURLToPath } from "url";
 import analyzeHandler from "./api/analyze";
 import contactHandler from "./api/contact";
 import statusHandler from "./api/status";
+import smeApplyHandler from "./api/sme-apply";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,6 +19,7 @@ async function startServer() {
   // API Routes
   app.post("/api/analyze", (req: any, res: any) => analyzeHandler(req, res));
   app.post("/api/contact", (req: any, res: any) => contactHandler(req, res));
+  app.post("/api/sme-apply", (req: any, res: any) => smeApplyHandler(req, res));
   app.get("/api/status", (req: any, res: any) => statusHandler(req, res));
 
   // Vite middleware for development
